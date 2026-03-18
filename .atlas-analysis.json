@@ -1,0 +1,118 @@
+{
+  "projectType": "general",
+  "projectName": "OpenRocket",
+  "projectDescription": "A free, open-source model rocket simulator that lets you design, visualize, and simulate rockets before building and flying them.",
+  "theme": "palm",
+  "primaryColor": "#ba4519",
+  "lightColor": "#dcbec0",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "User Guide",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "introduction/overview",
+              "introduction/features",
+              "introduction/faq",
+              "introduction/contribute"
+            ]
+          },
+          {
+            "group": "Setup",
+            "pages": [
+              "setup/installation",
+              "setup/getting-started",
+              "setup/preferences"
+            ]
+          },
+          {
+            "group": "Rocket Design",
+            "pages": [
+              "user-guide/basic-rocket-design",
+              "user-guide/advanced-rocket-design",
+              "user-guide/overrides-and-surface-finish"
+            ]
+          },
+          {
+            "group": "Flight Simulation",
+            "pages": [
+              "user-guide/basic-flight-simulation",
+              "user-guide/advanced-flight-simulation",
+              "user-guide/rocket-analysis",
+              "user-guide/thrust-curves",
+              "user-guide/custom-expressions",
+              "user-guide/simulation-extensions"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Developer Guide",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": [
+              "dev-guide/development-overview",
+              "dev-guide/development-setup",
+              "dev-guide/development-guidelines"
+            ]
+          },
+          {
+            "group": "Architecture",
+            "pages": [
+              "dev-guide/architecture",
+              "dev-guide/codebase-walkthrough",
+              "dev-guide/file-specification"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "dev-guide/using-openrocket-core",
+              "dev-guide/api-documentation",
+              "dev-guide/command-line-arguments"
+            ]
+          },
+          {
+            "group": "Contributing",
+            "pages": [
+              "dev-guide/testing-and-debugging",
+              "dev-guide/contributing-to-translations",
+              "dev-guide/contributing-to-docs",
+              "dev-guide/building-releasing",
+              "dev-guide/faq-troubleshooting"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Six-degree-of-freedom (6DOF) flight simulation",
+    "Real-time altitude, velocity, and acceleration display",
+    "Automatic design optimization",
+    "Multi-stage and clustered motor support",
+    "Extended Barrowman stability computation (CG and CP)",
+    "3D rocket visualization and OBJ export for 3D printing",
+    "Drag and stability analysis per component",
+    "Configurable simulation plots and CSV export",
+    "Custom simulation listeners and expressions",
+    "Import/export to RockSim (.rkt) and RASAero II (.cdx1) formats",
+    "Built-in motor database from ThrustCurve.org",
+    "Cross-platform (Windows, macOS, Linux) Java application"
+  ],
+  "publicApiSurface": [
+    "OpenRocketCore.initialize()",
+    "OpenRocketDocumentFactory.createNewRocket()",
+    "GeneralRocketLoader.load()",
+    "GeneralRocketSaver.save()",
+    "Rocket / AxialStage / NoseCone / BodyTube / Transition / TrapezoidFinSet",
+    "Simulation / SimulationOptions",
+    "info.openrocket.core.rocketcomponent.*",
+    "info.openrocket.core.simulation.*",
+    "info.openrocket.core.startup.Application / CoreModule / PluginModule"
+  ]
+}
