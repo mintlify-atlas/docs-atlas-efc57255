@@ -1,0 +1,582 @@
+---
+title: File specification
+description: Specification of the OpenRocket design file format (.ork) and the component preset file format (.orc).
+---
+
+This page describes the two file formats used by OpenRocket:
+
+- **`.ork`** — the rocket design file, which stores a complete rocket design and all its simulations.
+- **`.orc`** — the component preset file, which defines a database of standard rocket parts.
+
+<Tabs>
+  <Tab title=".ork design file">
+
+## OpenRocket design file (`.ork`)
+
+The `.ork` file format stores a complete rocket design including all components, materials, motor configurations, simulation settings, and simulation results.
+
+### File architecture
+
+A `.ork` file is a **ZIP archive** containing an XML file and any associated graphics (e.g. decal images). The main rocket design XML is stored inside the archive as `rocket.ork`.
+
+To inspect the contents of a `.ork` file:
+
+<Steps>
+  <Step title="Rename the file">
+    Rename the file extension from `.ork` to `.zip`.
+  </Step>
+  <Step title="Extract the archive">
+    Open the resulting `.zip` file with any ZIP extraction tool.
+  </Step>
+  <Step title="Open the XML">
+    The main design is in the file named `rocket.ork` inside the archive. Open it in any text editor. As of format version 1.11, a `preview.png` thumbnail is also included.
+  </Step>
+</Steps>
+
+<Note>
+  OpenRocket also accepts the `.ork.gz` extension for backward compatibility, but the plain `.ork` extension is recommended for all new files.
+</Note>
+
+### Developer reference
+
+The reading and writing code is located in the `core` module:
+
+**Reading (`.ork` → rocket model):**
+
+| Class | Purpose |
+|---|---|
+| `OpenRocketLoader.java` | Main entry point for loading a `.ork` file |
+| `OpenRocketContentHandler.java` | SAX content handler for the XML |
+| `ComponentHandler.java` | Dispatches parsing to the correct component handler |
+| `ComponentParameterHandler.java` | Reads common component parameters |
+| Specialized handlers | `SimulationConditionsHandler.java`, `WindHandler.java`, `MotorHandler.java`, etc. |
+
+All reader classes are in `core/src/main/java/info/openrocket/core/file/openrocket/importt/`.
+
+**Writing (rocket model → `.ork`):**
+
+| Class | Purpose |
+|---|---|
+| `OpenRocketSaver.java` | Main entry point for saving a `.ork` file |
+| `RocketComponentSaver.java` | Base class with shared saving logic |
+| `NoseConeSaver.java`, `BodyTubeSaver.java`, etc. | Component-specific savers |
+
+All writer classes are in `core/src/main/java/info/openrocket/core/file/openrocket/savers/`.
+
+### Version history
+
+The format version is declared in the `version` attribute of the root `<openrocket>` element. The version number follows semantic versioning: major version increases indicate backward-incompatible changes; minor version increases are backward-compatible additions.
+
+| Version | OpenRocket release | Key changes |
+|---|---|---|
+| 1.0 | 0.9.0 | Initial public release |
+| 1.1 | 0.9.4 | Fin tab support; tube coupler subcomponents |
+| 1.2 | 1.1.1 | Motor digest tag for thrust curve identification |
+| 1.3 | 1.1.9 | Launch longitude and geodetic method parameters |
+| 1.4 | 12.03 | Launch rod and deployment velocity; stage separation events |
+| 1.5 | 12.09 | Component presets; custom expressions; lower-stage separation event |
+| 1.6 | 13.04 | Component appearances (decals and paint); configurable recovery/ignition/separation |
+| 1.7 | 15.03 | Simulation extensions; tube fin support |
+| 1.8 | 22.02 | Rail buttons, pod sets, parallel stages (boosters); PhotoStudio settings; override CD |
+| 1.9 | 23.09 | Component IDs for flight event sources |
+| 1.10 | 24.12 | Simulation warning priority; document preferences; multi-level wind model; warning flight events |
+| 1.11 | 25.xx | Simulation stepper method; table column preferences; preview image in ZIP; embedded thrust curve data |
+
+### Root structure
+
+Every `.ork` file begins with an XML declaration followed by an `<openrocket>` root element:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<openrocket version="1.12" creator="OpenRocket 25.xx">
+  <rocket>
+    <!-- Rocket definition -->
+  </rocket>
+  <simulations>
+    <!-- Simulation data -->
+  </simulations>
+  <photostudio>
+    <!-- PhotoStudio settings -->
+  </photostudio>
+  <docprefs>
+    <!-- Document preferences -->
+  </docprefs>
+</openrocket>
+```
+
+### Rocket element
+
+The `<rocket>` element holds the rocket metadata and all component definitions:
+
+```xml
+<rocket>
+  <name>My Rocket</name>
+  <id>[UUID]</id>
+  <designer>Jane Smith</designer>
+  <designtype>sport</designtype>
+  <revision>Rev A</revision>
+  <motorconfiguration configid="[UUID]" default="true">
+    <stage number="0" active="true"/>
+  </motorconfiguration>
+  <subcomponents>
+    <!-- Nose cone, body tubes, fins, etc. -->
+  </subcomponents>
+</rocket>
+```
+
+Key attributes:
+
+| Element | Description |
+|---|---|
+| `name` | Rocket design name |
+| `id` | UUID auto-generated by OpenRocket |
+| `designer` | Designer's name |
+| `designtype` | One of: `scratch`, `kit`, `makeitgo`, `educational`, `sport`, `competition` |
+| `motorconfiguration` | One entry per defined motor configuration |
+| `subcomponents` | Container for all rocket components |
+
+### Common component attributes
+
+All rocket components share these common child elements:
+
+| Element | Description |
+|---|---|
+| `id` | UUID auto-generated by OpenRocket |
+| `name` | Component name |
+| `finish` | Surface finish type |
+| `material` | Material with `type` (bulk/surface/line), `density`, and optional `group` |
+| `axialoffset` | Position along the rocket axis |
+| `radialdirection` | Angular direction for radially placed components |
+
+### Component tags
+
+<AccordionGroup>
+  <Accordion title="Structural components">
+
+**Nose cone (`<nosecone>`):**
+
+```xml
+<nosecone>
+  <name>Nose cone</name>
+  <id>[UUID]</id>
+  <material type="bulk" density="500.0">Basswood</material>
+  <length>0.22</length>
+  <thickness>0.002</thickness>
+  <shape>power</shape>
+  <shapeclipped>false</shapeclipped>
+  <shapeparameter>0.4</shapeparameter>
+  <aftradius>0.075</aftradius>
+</nosecone>
+```
+
+Supported `<shape>` values: `ogive`, `conical`, `ellipsoid`, `power`, `parabolic`, `haack`.
+
+**Body tube (`<bodytube>`):**
+
+```xml
+<bodytube>
+  <name>Body tube</name>
+  <id>[UUID]</id>
+  <material type="bulk" density="680.0">Cardboard</material>
+  <length>0.3</length>
+  <thickness>0.002</thickness>
+  <radius>auto</radius>
+</bodytube>
+```
+
+**Transition (`<transition>`):** Connects two tubes of different diameters. Supports the same shapes as nose cones.
+
+  </Accordion>
+  <Accordion title="Fin sets">
+
+**Trapezoidal fin set (`<trapezoidfinset>`):**
+
+```xml
+<trapezoidfinset>
+  <fincount>3</fincount>
+  <thickness>0.003</thickness>
+  <crosssection>square</crosssection>
+  <rootchord>0.05</rootchord>
+  <tipchord>0.05</tipchord>
+  <sweeplength>0.025</sweeplength>
+  <height>0.03</height>
+</trapezoidfinset>
+```
+
+**Elliptical fin set (`<ellipticalfinset>`):** Requires `<rootchord>` and `<height>`.
+
+**Freeform fin set (`<freeformfinset>`):** Uses `<finpoints>` with individual `<point x="..." y="..."/>` elements for arbitrary fin shapes.
+
+**Tube fin set (`<tubefinset>`):** Cylindrical fins. Requires `<radius>`, `<length>`, and `<thickness>`.
+
+  </Accordion>
+  <Accordion title="Inner components">
+
+**Inner tube (`<innertube>`):** Motor mount tube inside a body tube. Supports cluster configurations.
+
+**Tube coupler (`<tubecoupler>`):** Coupler tube connecting two body tube sections.
+
+**Centering ring (`<centeringring>`):** Ring that centers an inner tube within a body tube.
+
+**Bulkhead (`<bulkhead>`):** Solid disk that closes the end of a tube.
+
+**Engine block (`<engineblock>`):** Ring that retains a motor inside an inner tube.
+
+  </Accordion>
+  <Accordion title="Launch guides">
+
+**Launch lug (`<launchlug>`):** Tube-style launch lug. Attributes include `<radius>`, `<length>`, `<thickness>`, and `<instancecount>`.
+
+**Rail button (`<railbutton>`):** Rail launch guide. Attributes include `<outerdiameter>`, `<innerdiameter>`, `<height>`, `<baseheight>`, and `<flangeheight>`.
+
+  </Accordion>
+  <Accordion title="Recovery and mass components">
+
+**Parachute (`<parachute>`):** Attributes include `<diameter>`, `<cd>`, `<linecount>`, `<linelength>`, `<deployevent>`, `<deployaltitude>`, and `<deploydelay>`.
+
+**Streamer (`<streamer>`):** Attributes include `<striplength>`, `<stripwidth>`, `<deployevent>`, `<deployaltitude>`, and `<deploydelay>`.
+
+**Shock cord (`<shockcord>`):** Attributes include `<cordlength>` and `<material>`.
+
+**Mass component (`<masscomponent>`):** Generic non-structural mass. Use `<masscomponenttype>` to differentiate between nose weight, recovery wadding, altimeter, etc.
+
+  </Accordion>
+  <Accordion title="Assemblies">
+
+**Stage (`<stage>`):** A stackable rocket stage. Attributes include `<separationevent>`, `<separationaltitude>`, and `<separationdelay>`.
+
+**Pod set (`<podset>`):** A set of identical pods radially positioned around the rocket. Added in format version 1.8.
+
+**Parallel stage / booster (`<parallelstage>`):** Side-mounted booster that separates during flight. Added in format version 1.8.
+
+  </Accordion>
+</AccordionGroup>
+
+### Motor mount
+
+Any body tube or inner tube can be used as a motor mount. When it is, a `<motormount>` child element is present:
+
+```xml
+<bodytube>
+  <!-- ...other tube attributes... -->
+  <motormount>
+    <ignitionevent>automatic</ignitionevent>
+    <ignitiondelay>0.0</ignitiondelay>
+    <overhang>0.003</overhang>
+    <motor configid="[UUID]">
+      <manufacturer>Estes</manufacturer>
+      <designation>A8</designation>
+      <diameter>0.018</diameter>
+      <length>0.07</length>
+      <delay>3.0</delay>
+      <!-- Embedded thrust curve (added in version 1.11) -->
+      <standarddelays>0,3,5,none</standarddelays>
+      <thrustcurvepoint>0,0,0.035,0.0164</thrustcurvepoint>
+      <thrustcurvepoint>1,9,0.035,0.0145</thrustcurvepoint>
+    </motor>
+  </motormount>
+</bodytube>
+```
+
+As of format version 1.11, the full thrust curve is embedded directly in the `<motor>` element. When `<thrustcurvepoint>` elements are present, OpenRocket reconstructs the motor from the embedded data instead of looking it up in the motor database. This makes designs self-contained when sharing custom motors.
+
+- `<standarddelays>` — comma-separated list of standard delays in seconds; use `none` for plugged/no ejection charge.
+- `<thrustcurvepoint>` — `time,thrust,cg_x,mass` in seconds, Newtons, meters, kilograms.
+
+### Simulation data
+
+The `<simulations>` section contains one `<simulation>` element per simulation:
+
+```xml
+<simulations>
+  <simulation status="loaded">
+    <name>Simulation 1</name>
+    <simulator>RK4Simulator</simulator>
+    <calculator>BarrowmanCalculator</calculator>
+    <conditions>
+      <configid>[UUID]</configid>
+      <launchrodlength>1.0</launchrodlength>
+      <launchrodangle>0.0</launchrodangle>
+      <launchaltitude>0.0</launchaltitude>
+      <launchlatitude>45.0</launchlatitude>
+      <atmosphere model="isa"/>
+      <timestep>0.05</timestep>
+      <wind model="average">
+        <speed>2.0</speed>
+        <direction>1.5707963267948966</direction>
+        <standarddeviation>0.2</standarddeviation>
+      </wind>
+    </conditions>
+    <flightdata maxaltitude="50.605" maxvelocity="29.249" timetoapogee="3.443"
+                flighttime="15.89" groundhitvelocity="4.583"/>
+  </simulation>
+</simulations>
+```
+
+**Wind models:** OpenRocket supports two models:
+
+```xml
+<!-- Average wind model -->
+<wind model="average">
+  <speed>2.0</speed>
+  <direction>1.5707963267948966</direction>
+  <standarddeviation>0.2</standarddeviation>
+</wind>
+
+<!-- Multi-level wind model (added in version 1.10) -->
+<wind model="multilevel" altituderef="agl">
+  <windlevel altitude="0.0" speed="2.0" direction="1.57" standarddeviation="0.2"/>
+  <windlevel altitude="100.0" speed="3.0" direction="1.57" standarddeviation="0.3"/>
+  <windlevel altitude="500.0" speed="5.0" direction="1.60" standarddeviation="0.4"/>
+</wind>
+```
+
+The `altituderef` attribute is either `agl` (above ground level) or `msl` (mean sea level).
+
+### Document preferences
+
+The `<docprefs>` section stores document-wide settings including custom material definitions:
+
+```xml
+<docprefs>
+  <docmaterials>
+    <material>BULK|My Custom Material|680.0|1.2E9|Custom</material>
+  </docmaterials>
+</docprefs>
+```
+
+Material string format: `{type}|{name}|{density}|{inPlaneShearModulus}|{group}`. Older files may omit `inPlaneShearModulus`.
+
+  </Tab>
+  <Tab title=".orc component file">
+
+## OpenRocket component file (`.orc`)
+
+The `.orc` file format defines a database of standard rocket parts (component presets). Users can select presets from this database instead of entering all dimensions manually.
+
+### File architecture
+
+A `.orc` file is a **plain XML file**. During the build process, all `.orc` files are serialized into a single binary file (`system.ser`) that is bundled inside the OpenRocket JAR. The component database is a Git submodule at `core/resources-src/datafiles/openrocket-database`.
+
+<Note>
+  The `.orc` format uses JAXB (Jakarta XML Binding) annotations for serialization and deserialization. This is different from the `.ork` format, which uses SAX parsing for reading and direct XML writing for saving.
+</Note>
+
+### Developer reference
+
+**Reading (`.orc` → `ComponentPreset` objects):**
+
+| Class | Purpose |
+|---|---|
+| `OpenRocketComponentLoader.java` | Main loader |
+| `OpenRocketComponentDTO.java` | Root XML data transfer object |
+| `BodyTubeDTO.java`, `NoseConeDTO.java`, etc. | Component-specific DTOs |
+| `MaterialDTO.java` | Material DTO |
+| `BaseComponentDTO.java` | Shared base DTO |
+
+**Writing (`ComponentPreset` objects → `.orc`):**
+
+The `OpenRocketComponentSaver.java` class uses JAXB marshalling from the same DTO classes.
+
+All classes are in `core/src/main/java/info/openrocket/core/preset/xml/`.
+
+### Root structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OpenRocketComponent>
+  <Version>0.1</Version>
+  <Materials>
+    <!-- Material definitions -->
+  </Materials>
+  <Components>
+    <!-- Component definitions -->
+  </Components>
+</OpenRocketComponent>
+```
+
+### Materials
+
+Material definitions have scope only within their `.orc` file. When a component from a preset is added to a `.ork` design, the material definition is copied into the design at that point. Later changes to the `.orc` file do not automatically update existing designs.
+
+```xml
+<Materials>
+  <Material UnitsOfMeasure="g/cm3">
+    <Name>Cardboard</Name>
+    <Density>680.0</Density>
+    <ShearModulus>1.2E9</ShearModulus>
+    <Type>BULK</Type>
+    <Group>PaperProducts</Group>
+  </Material>
+</Materials>
+```
+
+Supported `UnitsOfMeasure` values:
+
+| Category | Values |
+|---|---|
+| Bulk density | `g/cm3`, `kg/m3`, `lb/ft3` |
+| Areal density | `g/cm2`, `oz/in2` |
+| Line density | `g/cm`, `oz/in` |
+
+Material `Type` must be one of `BULK`, `SURFACE`, or `LINE`.
+
+### Common component attributes
+
+All component types share these child elements:
+
+```xml
+<Manufacturer>Estes</Manufacturer>
+<PartNumber>BT-60</PartNumber>
+<Description>Estes BT-60 body tube, 12 inches</Description>
+<Material Type="BULK" Group="PaperProducts">Cardboard</Material>
+<Mass Unit="kg">0.035892</Mass>
+<Filled>true</Filled>
+<Thumbnail>base64EncodedImageData</Thumbnail>
+```
+
+`Thumbnail` is an optional Base64-encoded PNG image for the component browser.
+
+### Component types
+
+<AccordionGroup>
+  <Accordion title="Body tube">
+```xml
+<BodyTube>
+  <InsideDiameter Unit="m">0.0657352</InsideDiameter>
+  <OutsideDiameter Unit="m">0.06604</OutsideDiameter>
+  <Length Unit="m">0.36195</Length>
+</BodyTube>
+```
+  </Accordion>
+  <Accordion title="Nose cone">
+```xml
+<NoseCone>
+  <Shape>ELLIPSOID</Shape>
+  <ShapeParameter>1.0</ShapeParameter>
+  <Filled>true</Filled>
+  <OutsideDiameter Unit="m">0.06604</OutsideDiameter>
+  <BaseDiameter Unit="m">0.06604</BaseDiameter>
+  <ShoulderDiameter Unit="m">0.064922</ShoulderDiameter>
+  <ShoulderLength Unit="m">0.0381</ShoulderLength>
+  <Length Unit="m">0.1016</Length>
+  <Thickness Unit="m">0.003175</Thickness>
+</NoseCone>
+```
+
+Supported `<Shape>` values: `CONICAL`, `ELLIPSOID`, `HAACK`, `OGIVE`, `PARABOLIC`, `POWER`.
+
+<Note>
+  `HAACK`, `OGIVE`, `PARABOLIC`, and `POWER` support a shape parameter in the UI, but it cannot be specified in the `.orc` file.
+</Note>
+  </Accordion>
+  <Accordion title="Transition">
+```xml
+<Transition>
+  <Shape>OGIVE</Shape>
+  <ForeOutsideDiameter Unit="m">0.067056</ForeOutsideDiameter>
+  <ForeShoulderDiameter Unit="m">0.064973</ForeShoulderDiameter>
+  <ForeShoulderLength Unit="m">0.0254</ForeShoulderLength>
+  <AftOutsideDiameter Unit="m">0.03175</AftOutsideDiameter>
+  <Length Unit="m">0.1524</Length>
+  <Thickness Unit="m">0.003175</Thickness>
+</Transition>
+```
+  </Accordion>
+  <Accordion title="Centering ring, bulkhead, engine block">
+**Centering ring:**
+```xml
+<CenteringRing>
+  <InsideDiameter Unit="m">0.0187452</InsideDiameter>
+  <OutsideDiameter Unit="m">0.0240792</OutsideDiameter>
+  <Thickness Unit="m">0.003175</Thickness>
+  <Length Unit="m">0.00635</Length>
+</CenteringRing>
+```
+
+**Bulkhead:**
+```xml
+<BulkHead>
+  <Filled>true</Filled>
+  <OutsideDiameter Unit="m">0.028702</OutsideDiameter>
+  <Length Unit="m">0.0381</Length>
+</BulkHead>
+```
+
+**Engine block:**
+```xml
+<EngineBlock>
+  <InsideDiameter Unit="m">0.0131318</InsideDiameter>
+  <OutsideDiameter Unit="m">0.0179832</OutsideDiameter>
+  <Thickness Unit="m">0.003175</Thickness>
+  <Length Unit="m">0.003175</Length>
+</EngineBlock>
+```
+  </Accordion>
+  <Accordion title="Launch guides">
+**Launch lug:**
+```xml
+<LaunchLug>
+  <InsideDiameter Unit="m">0.0055626</InsideDiameter>
+  <OutsideDiameter Unit="m">0.006096</OutsideDiameter>
+  <Length Unit="m">0.0508</Length>
+</LaunchLug>
+```
+
+**Rail button:**
+```xml
+<RailButton>
+  <InnerDiameter Unit="m">0.008</InnerDiameter>
+  <OuterDiameter Unit="m">0.0097</OuterDiameter>
+  <Height Unit="m">0.0097</Height>
+  <BaseHeight Unit="m">0.002</BaseHeight>
+  <FlangeHeight Unit="m">0.002</FlangeHeight>
+</RailButton>
+```
+  </Accordion>
+  <Accordion title="Recovery components">
+**Parachute:**
+```xml
+<Parachute>
+  <Diameter Unit="m">0.6096</Diameter>
+  <DragCoefficient>0.80</DragCoefficient>
+  <Sides>8</Sides>
+  <LineCount>8</LineCount>
+  <LineLength Unit="m">0.7493</LineLength>
+</Parachute>
+```
+
+**Streamer:**
+```xml
+<Streamer>
+  <Length Unit="m">0.5</Length>
+  <Width Unit="m">0.05</Width>
+  <Thickness Unit="m">0.00005</Thickness>
+</Streamer>
+```
+
+**Tube coupler:**
+```xml
+<TubeCoupler>
+  <InsideDiameter Unit="m">0.0</InsideDiameter>
+  <OutsideDiameter Unit="m">0.017907</OutsideDiameter>
+  <Length Unit="m">0.019050</Length>
+</TubeCoupler>
+```
+  </Accordion>
+</AccordionGroup>
+
+### Units of measure
+
+All dimension attributes in `.orc` files use a `Unit` attribute:
+
+| Quantity | Supported units |
+|---|---|
+| Length | `mm`, `cm`, `m`, `in`, `in/64`, `ft` |
+| Mass | `g`, `kg`, `oz`, `lb` |
+| Density (bulk) | `g/cm3`, `kg/m3`, `lb/ft3` |
+| Density (areal) | `g/cm2`, `oz/in2` |
+| Density (line) | `g/cm`, `oz/in` |
+
+  </Tab>
+</Tabs>

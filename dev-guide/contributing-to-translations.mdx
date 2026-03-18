@@ -1,0 +1,101 @@
+---
+title: 'Contributing to translations'
+description: 'How to modify an existing translation or add a new language to OpenRocket.'
+---
+
+OpenRocket is translated into multiple languages. Translations are stored as Java `.properties` files and are maintained directly in the repository — no external translation platform is used.
+
+## How translations work
+
+OpenRocket's GUI elements never display hard-coded text. Instead, each widget retrieves its label through a `Translator` object by passing a key:
+
+```java
+private static final Translator trans = Application.getTranslator();
+
+JLabel label = new JLabel(trans.get("RocketPanel.lbl.ViewType"));
+```
+
+The `Translator` looks up the key in the active language file and returns the translated string. If a key is not present in the active language file, it falls back to the English base file.
+
+### Language files
+
+All translation files live in `core/src/main/resources/l10n/`:
+
+- `messages.properties` — the English base file; all keys are defined here
+- `messages_xx.properties` — per-language file, where `xx` is the [IETF language tag](https://en.wikipedia.org/wiki/IETF_language_tag) (for example, `messages_fr.properties` for French)
+
+### File format
+
+Language files use a simple key-value format. Lines starting with `!` are comments:
+
+```properties
+! RocketPanel
+RocketPanel.lbl.ViewType = View Type:
+RocketPanel.lbl.Zoom = Zoom:
+RocketPanel.lbl.Stability = Stability:
+```
+
+Key naming convention: `{ClassName}.{widgetType}.{ShortDescription}`. For example, `RocketPanel.lbl.ViewType` is the `ViewType` label (`lbl`) used by the `RocketPanel` class.
+
+The corresponding Dutch translation looks like this:
+
+```properties
+! RocketPanel
+RocketPanel.lbl.ViewType = Weergavetype:
+RocketPanel.lbl.Zoom = Zoom:
+RocketPanel.lbl.Stability = Stabiliteit:
+```
+
+## Modifying an existing translation
+
+<Steps>
+  <Step title="Find the language file">
+    Open `core/src/main/resources/l10n/messages_xx.properties` for the language you want to update. For example, `messages_fr.properties` for French.
+  </Step>
+  <Step title="Edit the translation">
+    Find the key you want to change and update its value. Do not change the key itself — only the translated text on the right-hand side.
+  </Step>
+  <Step title="Submit a pull request">
+    Commit your changes and open a pull request. The maintainers will review and merge the update.
+
+    If you are not familiar with Git, you can instead [open an issue](https://github.com/openrocket/openrocket/issues/new/choose) and paste your changes there.
+  </Step>
+</Steps>
+
+## Creating a new translation
+
+<Steps>
+  <Step title="Create the language file">
+    Create a new file `messages_xx.properties` in `core/src/main/resources/l10n/`, where `xx` is the language code. For example, `messages_fi.properties` for Finnish.
+
+    Copy the full contents of `messages.properties` into the new file, then translate the English values into your language.
+  </Step>
+  <Step title="Register the new locale">
+    Open `swing/src/main/java/info/openrocket/swing/gui/util/SwingPreferences.java` and add the new language code to the `SUPPORTED_LOCALES` array:
+
+    ```java
+    // Before
+    for (String lang : new String[] { "en", "ar", "de", "es", "fr", "it", "nl", "ru", "cs", "pl", "ja", "pt", "tr" }) {
+    ```
+
+    ```java
+    // After (adding "fi" for Finnish)
+    for (String lang : new String[] { "en", "ar", "de", "es", "fr", "it", "nl", "ru", "cs", "pl", "ja", "pt", "tr", "fi" }) {
+    ```
+  </Step>
+  <Step title="Credit yourself">
+    Add your name to the list of translation contributors in two places:
+
+    - `swing/src/main/java/info/openrocket/swing/gui/dialogs/AboutDialog.java` — edit the `CREDITS` string and add your details after the `Translations by:` tag.
+    - `README.md` — add your name in the translations section.
+  </Step>
+  <Step title="Submit a pull request">
+    Commit all your changes (new language file, `SwingPreferences.java`, `AboutDialog.java`, and `README.md`) and open a pull request.
+
+    If you are not familiar with Git, [open an issue](https://github.com/openrocket/openrocket/issues/new/choose) with your translation and the maintainers will handle the pull request for you.
+  </Step>
+</Steps>
+
+<Note>
+  Translated strings that are identical to the English base (for example, abbreviations or proper nouns) can simply be left as-is in the language file. The fallback to English is automatic.
+</Note>

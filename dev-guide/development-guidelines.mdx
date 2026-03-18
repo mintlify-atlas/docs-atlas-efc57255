@@ -1,0 +1,115 @@
+---
+title: Development guidelines
+description: Coding standards, commit conventions, pull request process, and code style rules for contributing to OpenRocket.
+---
+
+These guidelines exist to maintain code quality and make it easier for maintainers and other contributors to review and understand changes.
+
+## Coding standards
+
+- **Write unit tests.** Cover new behavior and include edge cases. Tests prevent regressions and make it easier to verify correctness.
+- **Use atomic commits.** Each commit should represent a single logical change. Do not combine an unrelated bug fix and a new feature in one commit — split them.
+- **Write clear commit messages.** The subject line should be concise and written in the present tense (e.g., `Fix bug`, not `Fixed bug`). Add a blank line followed by a more detailed explanation when necessary.
+- **Reference issues in commit messages.** If your commit addresses GitHub issue #123, format the subject as `[#123] Fix bug`. This automatically links the commit to the issue.
+
+## Code style
+
+OpenRocket follows these formatting rules:
+
+| Rule | Standard |
+|---|---|
+| Indentation | 4 spaces, no tabs |
+| Line length | Maximum 120 characters |
+| Class names | `PascalCase` (e.g., `RocketComponent`) |
+| Methods and variables | `camelCase` (e.g., `getAltitude()`) |
+| Constants | `UPPER_SNAKE_CASE` (e.g., `MAX_ALTITUDE`) |
+
+### Javadoc
+
+Add Javadoc comments to all public classes, methods, and fields. Include descriptions, parameter explanations, return values, and any exceptions thrown:
+
+```java
+/**
+ * Calculates the apogee of the rocket.
+ *
+ * @param simulation The simulation to use for the calculation
+ * @return The apogee altitude in meters
+ * @throws SimulationException If the simulation fails
+ */
+public double calculateApogee(Simulation simulation) throws SimulationException {
+    // Implementation
+}
+```
+
+### Imports
+
+Organize imports and avoid wildcard imports (e.g., `import java.util.*`). Let your IDE manage import ordering.
+
+### Exception handling
+
+Always handle or propagate exceptions explicitly. Do not catch an exception and ignore it without a comment explaining why.
+
+### Resource management
+
+Always close resources such as files and streams. Prefer `try`-with-resources:
+
+```java
+try (InputStream in = new FileInputStream(file)) {
+    // use in
+}
+```
+
+## Checkstyle
+
+OpenRocket enforces code style with [Checkstyle](https://checkstyle.sourceforge.io/). Run it before submitting a pull request:
+
+```bash
+./gradlew checkstyleMain checkstyleTest
+```
+
+Fix all violations before submitting. Checkstyle is configured with `ignoreFailures = false`, so a violation causes the build to fail.
+
+## Pull request process
+
+<Steps>
+  <Step title="Fork and create a branch">
+    Fork the OpenRocket repository and create a descriptively named branch for your change. See [Development setup](/dev-guide/development-setup) for forking instructions.
+  </Step>
+  <Step title="Implement your changes">
+    Follow the coding standards and code style rules described above. Write or update unit tests for the affected functionality.
+  </Step>
+  <Step title="Run tests and Checkstyle">
+    Verify that all tests pass and there are no Checkstyle violations:
+
+    ```bash
+    ./gradlew check
+    ```
+  </Step>
+  <Step title="Open a pull request">
+    Push your branch and open a pull request from your fork to the official `openrocket/openrocket` repository. Use the following structure in the PR description:
+
+    1. **Which issue this solves** — e.g., "This PR solves #123 in which buttons were displayed as red instead of blue."
+    2. **What the root cause was** — e.g., "The problem was that by default Java Swing displays buttons as red."
+    3. **How you fixed it** — e.g., "Fixed by overriding the default button color to blue."
+  </Step>
+  <Step title="Respond to review feedback">
+    Be prepared to revise your changes based on feedback from maintainers. The CI system will run tests automatically — ensure they pass.
+  </Step>
+  <Step title="Merge">
+    Once the pull request is approved and all CI checks pass, a maintainer will merge it into the main codebase.
+  </Step>
+</Steps>
+
+## Documentation guidelines
+
+When adding or modifying code, also update the relevant documentation:
+
+- **Javadoc** — Add to all public classes, methods, and fields.
+- **Inline comments** — Explain non-obvious logic.
+- **User documentation** — Update if your change affects user-facing behavior.
+- **Developer documentation** — Update this guide if your change affects the development process or API.
+- **Examples** — Provide examples for new APIs or features.
+
+<Tip>
+  If you want to work on a specific open issue, comment on it first to let others know. This prevents two contributors from duplicating effort on the same issue.
+</Tip>

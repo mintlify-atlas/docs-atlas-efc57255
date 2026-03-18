@@ -1,0 +1,274 @@
+---
+title: "Advanced rocket design"
+description: "Design multi-stage rockets, motor clusters, pod configurations, canted fins, and more using OpenRocket's advanced features."
+---
+
+This section covers advanced design techniques for high-power and complex rockets. The topics below build on the concepts in [basic rocket design](/user-guide/basic-rocket-design) and describe configurations common in high-power rocketry.
+
+<Warning>
+  The techniques on this page may require specialized materials and electronic devices intended for use by experienced rocketeers. Consult your national rocketry association's safety codes before attempting any of these configurations.
+</Warning>
+
+## Recovery systems
+
+Recovery systems return the rocket safely to the ground without damage. OpenRocket supports several recovery techniques.
+
+<Tabs>
+  <Tab title="Featherweight and break-apart">
+    Featherweight designs are often minimum-diameter rockets that eject the burned-out motor casing after burnout to induce aerodynamic instability and cause the rocket to tumble to the ground. Break-apart recovery splits the airframe into two or more sections connected by a shock cord, increasing drag and inducing instability.
+
+    Both techniques rely on terminal velocity being low enough that the rocket lands without damage. Typically, a featherweight rocket or each section of a break-apart rocket weighs less than one ounce.
+
+    <Note>
+      Ejecting burned-out motor casings is not permitted in NAR contests unless a streamer or parachute is attached to the ejected casing.
+    </Note>
+  </Tab>
+  <Tab title="Streamer">
+    A streamer attached to the shock cord creates drag during descent. Streamers are preferred on windy days because the rocket descends faster and drifts less than with a parachute.
+
+    Add a streamer in OpenRocket from the **Mass Components** section. NAR contest rules require 10 cm² of streamer area per gram of rocket mass.
+
+    Note that a streamer's effectiveness follows diminishing marginal returns: beyond a certain size, adding more area produces only a small additional drag increase. Rockets weighing more than 10 oz are generally beyond the effective range of streamer-only recovery.
+  </Tab>
+  <Tab title="Parachute">
+    Parachute recovery is the most common method for model and high-power rockets. OpenRocket provides simulation options including material, size, number of shroud lines, and packed dimensions. You can configure the deployment to match your actual rocket's ejection charge system.
+
+    OpenRocket models an idealized parachute shape. Different real-world chute types (parasheeet, spill-hole, parafoil) will deviate from this ideal. You can adjust the drag coefficient override to account for these differences. NAR contest rules require 5 cm² of parachute area per gram of rocket mass.
+  </Tab>
+  <Tab title="Helicopter and gliding">
+    **Helicopter recovery** uses auto-rotating rigid blades to slow terminal velocity. This is the most mechanically complex recovery method and is only practical for low-mass model rockets due to blade stress on landing.
+
+    **Gliding recovery** uses aerodynamic lift to control descent. Because the aerodynamic requirements of vertical boost flight and gliding are fundamentally different, some mechanism — such as ejected weight, deployable fins, or swing-wings — must shift the center of gravity or center of pressure at apogee to initiate the transition to glide. Radio-control systems are commonly used for guided gliders, even at high power.
+  </Tab>
+</Tabs>
+
+### Protecting recovery components
+
+Recovery hardware must be shielded from the heat of the ejection charge. Common methods include:
+
+<AccordionGroup>
+  <Accordion title="Fire-resistant wadding and Nomex blankets">
+    Place flameproof material between the ejection charge and the recovery hardware. Options include Estes flameproof ejection wadding, flame-retardant recycled cellulose insulation ("dog barf"), or a reusable Nomex blanket.
+
+    Use a minimum depth of 1.5 tube diameters of wadding. Do not pack it tightly.
+
+    A Nomex blanket should be a square with a width approximately 3 times the body tube diameter.
+  </Accordion>
+  <Accordion title="Piston ejection">
+    A sliding piston inserted into the body tube separates the ejection charge from the recovery hardware. The expanding ejection gas pushes the piston (and the recovery hardware) out of the rocket without direct heat exposure.
+
+    Pistons are often made from tube couplers sanded to slide smoothly inside the body tube, with one end sealed by a bulkhead. The piston must slide freely — if it sticks, the parachute may not deploy.
+  </Accordion>
+  <Accordion title="Cooling mesh and baffles">
+    A metal cooling mesh filters and cools ejection gases before they reach the recovery hardware. A baffle uses two bulkheads with offset hole patterns to deflect hot gas while stopping heavy burning particles.
+
+    Both systems have limited lifespans and require periodic cleaning or replacement.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Tube fins and ring tails
+
+### Tube fins
+
+Tube fins are body tube sections adhered to the outside of the main airframe, used instead of (or in addition to) flat fins.
+
+To add tube fins in OpenRocket:
+
+<Steps>
+  <Step title="Select the body tube">
+    In the design tree, left-click the body tube you want to attach fins to.
+  </Step>
+  <Step title="Add a tube fin set">
+    Click **Tube fins** in the **Body Components and Fin Sets** panel. The **Tube fin set configuration** window opens.
+  </Step>
+  <Step title="Configure dimensions">
+    Adjust the **Length** slider to set fin length. Use the **Plus** slider (under **Position relative to**) to position the fin set along the body tube.
+  </Step>
+  <Step title="Set the number of fins and rotation">
+    Switch to the **Back view** in the main window to see the cross-section. Adjust **Number of fins** and the **Fin rotation** slider to align fins with other components such as the launch lug.
+  </Step>
+  <Step title="Use the Automatic checkbox">
+    Enabling the **Automatic** checkbox on the **Outer diameter** field makes the tube fins conform to the body tube and touch each other — this is typically the easiest configuration to build.
+  </Step>
+</Steps>
+
+<Warning>
+  Tube fins that are sliced at an angle or cut in half lengthwise cannot be modeled with the Tube fins component. All tube fins must be in side-to-side contact with the body tube.
+</Warning>
+
+### Ring tails
+
+A ring tail fin can be visually added to an OpenRocket model using a body tube, but **OpenRocket does not accurately simulate ring tail aerodynamics**. Use this approach only for visual reference.
+
+Adding a ring tail body tube will trigger a "Discontinuity in rocket body diameter" warning, which is expected.
+
+---
+
+## Through-the-wall fin mounting
+
+For high-thrust motors (E class and above), fins glued only to the surface of the airframe can be ripped off by thrust or vibration. Through-the-wall (TTW) mounting runs fins through slots in the airframe and bonds them to the motor mount tube, centering rings, and the airframe wall simultaneously.
+
+Three measurements define a fin tab:
+
+| Measurement | Definition |
+|-------------|------------|
+| **Tab length** | The distance from one side of the fin tab to the other. Equals the length of the slot cut through the airframe. |
+| **Tab height** | The distance from the outside of the airframe to the outside of the motor mount tube: `(BT OD − MMT OD) / 2`. |
+| **Tab position** | The distance from the root chord reference point to the fin tab reference point. Three reference options are available: leading edge, midpoint, or trailing edge of the root chord. |
+
+To add through-the-wall tabs automatically:
+
+<Steps>
+  <Step title="Open the fin set configuration">
+    In the rocket design view, double-click the **Trapezoidal fin set** component.
+  </Step>
+  <Step title="Switch to the Fin tabs tab">
+    Click the **Fin tabs** tab in the configuration window.
+  </Step>
+  <Step title="Calculate automatically">
+    Click **Calculate automatically**. OpenRocket places the fin tab between the two motor mount centering rings.
+  </Step>
+</Steps>
+
+<Note>
+  OpenRocket's auto-calculation places the tab between the outermost centering rings beneath the fin. If more than two centering rings are present, it uses the first and second rings from the trailing edge. Only one fin tab per fin is supported.
+</Note>
+
+---
+
+## Clustering and multi-staging
+
+Complex rockets fall into two categories:
+
+- **Motor clusters** — multiple motors ignited simultaneously
+- **Multi-staged rockets** — motors that ignite successively as lower stages burn out
+
+### Motor clustering
+
+Clustering refers to launching a rocket with two or more simultaneously ignited motors. Common model rocketry cluster configurations are 2-motor (side by side), 3-motor (triangle or line), 4-motor (square), and 5-motor (one central surrounded by four).
+
+Standard motor mount inner diameters: 13, 18, 24, 29, 38, 54, 75, and 98 mm.
+
+To design a clustered motor configuration in OpenRocket:
+
+<Steps>
+  <Step title="Add an inner tube">
+    Add an **Inner tube** to the aft body tube. On the **Motor** tab, check **This component is a motor mount** and set the inner diameter to a standard motor size.
+  </Step>
+  <Step title="Open the Cluster tab">
+    Click the **Cluster** tab in the Inner tube configuration window.
+  </Step>
+  <Step title="Choose a cluster configuration">
+    Select a cluster layout from the image tiles on the left side of the tab. Not every cluster will fit depending on your motor tube and body tube sizes.
+  </Step>
+  <Step title="Adjust tube separation">
+    The **Tube separation** value controls how close the motors are to each other. A value of 1 places tubes in contact. Consider how spacing affects igniter wiring and construction access.
+  </Step>
+  <Step title="Set rotation">
+    Use the **Rotation** setting to align the cluster with other structural or decorative components. This is especially important if ejection gas must be ducted from one part of the rocket to another.
+  </Step>
+</Steps>
+
+<Info>
+  Components added to a clustered inner tube — such as an engine block or mass component — are added to every tube in the cluster simultaneously.
+
+  The **Split cluster** button converts the cluster to individually positionable tubes. This action cannot be undone; you must recreate the cluster to revert.
+</Info>
+
+#### Igniting a cluster
+
+All motors in a cluster must ignite more or less simultaneously for stable flight. Most clusters are wired in parallel so that a single launch controller voltage fires all igniters at once. Ensure the controller can supply adequate current for the number of igniters.
+
+Convenient tools for cluster ignition include:
+- **Buss bar** — a short, non-insulated wire that simplifies bridging multiple igniter connections in a tight space
+- **Cluster whip** — a set of wires and micro-clips that splits one pair of launch controller clips into multiple sets
+
+<Warning>
+  APCP motors (Aerotech, Cesaroni, Loki) are slower to ignite than black powder motors and may chuff, delay, or spit the igniter out. Clustered APCP ignition is unreliable. Design your rocket to remain safe if only some motors ignite before liftoff.
+</Warning>
+
+### Conventional multi-staging
+
+In conventional (closed-hull) staging, finned stages holding motors are stacked. Lower stages separate under ejection charge pressure as upper stages ignite.
+
+Key design considerations:
+
+- The center of mass starts toward the rear when lower-stage motors are loaded. As motors burn out and stages are ejected, the center of mass moves forward.
+- Maintain at least 1.0 caliber of separation between the center of mass (forward) and the center of pressure (aft) throughout all flight phases.
+- Conventional staging is generally limited to three stages due to the "Pisa Effect" — an increasing arc in trajectory that accumulates with each staging event.
+
+### Rack staging
+
+In rack (open-hull) staging, motors are stacked end-to-end in a non-separating frame. Only burned-out casings are ejected as higher stages ignite. Because only casings (not full stages) are discarded, rack staging does not suffer from the Pisa Effect and is not inherently limited in stage count.
+
+---
+
+## Pods
+
+Pods are assembly components that attach to a body tube and hold physical components adjacent to the main airframe — for example, side motors, external payloads, or auxiliary structures. Unlike boosters, pods **cannot separate** from the rocket during flight.
+
+To add a pod:
+
+1. Select a **Body tube** in the design tree.
+2. Click **Pod** in the **Assembly Components** section.
+3. Configure the pod's **General**, **Override**, and **Comment** tabs.
+4. Add physical components inside the pod (body tubes, motors, etc.).
+
+<Warning>
+  Pods should never be left empty. An empty pod has no physical meaning and will be treated as having no mass or aerodynamic contribution.
+</Warning>
+
+---
+
+## Canted fins for roll stabilization
+
+Fins can be canted (angled) relative to the rocket's longitudinal axis to induce axial spin, which improves roll stabilization during flight. OpenRocket supports fin cant as a parameter on any fin set.
+
+The maximum allowed cant in OpenRocket is **15 degrees** (defined as `FinSet.MAX_CANT_RADIANS` in `FinSet.java`).
+
+To set fin cant:
+
+1. Open the fin set configuration window.
+2. On the **General** tab, locate the **Cant angle** field.
+3. Enter a positive or negative value (in degrees) to rotate the fins around their root chord axis.
+
+<Tip>
+  A small cant angle (1–3 degrees) is usually sufficient for roll stabilization without producing excessive induced drag. Monitor the stability margin in the design window after applying cant.
+</Tip>
+
+---
+
+## Component presets and parts library
+
+OpenRocket includes a built-in parts library of manufacturer-provided component presets. Presets provide accurate geometry and mass data for commercially available nose cones, body tubes, fin sets, and more.
+
+To use a preset:
+
+1. Open any component configuration window.
+2. Click the **Parts Library** button in the upper-right corner of the window.
+3. Browse or filter available presets by type and manufacturer.
+4. Select a preset to populate the configuration window with its specification data.
+
+<Note>
+  The parts library reflects what was available at the time the OpenRocket component database was compiled. Some components listed may no longer be available from their manufacturer.
+</Note>
+
+Presets can be used for any component type that supports them, including body tubes, nose cones, tube fins, transitions, and inner tubes. Diameter fields are not always populated from presets — verify all dimensions after applying a preset.
+
+---
+
+## Regulatory overview
+
+Rocketry in the United States is regulated primarily by the NFPA and the FAA.
+
+| Classification | Requirements |
+|----------------|--------------|
+| **Model rocket** (NFPA § 1122) | No more than 1,500 g with motors installed; total impulse no more than 320 N·s; no more than 125 g of propellant. |
+| **High power rocket** (NFPA § 1127) | More than 1,500 g with motors installed, or total impulse exceeding 320 N·s. |
+| **Complex high power rocket** | Multi-staged or propelled by a cluster of two or more motors. |
+
+A high-power rocket with more than 2,560 N·s of total impulse must have an electronically actuated recovery system.
+
+NAR certification levels (L1, L2, L3) are required to purchase high-power motor components in the US. Contact the [National Association of Rocketry](http://www.nar.org/) for certification requirements.

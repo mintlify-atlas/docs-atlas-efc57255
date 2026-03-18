@@ -1,0 +1,257 @@
+---
+title: "Basic rocket design"
+description: "Learn the four component categories in OpenRocket and build a complete model rocket from scratch."
+---
+
+This section walks you through designing a basic rocket in OpenRocket. You will explore the available component categories, examine the *A simple model rocket* example design, and then build that same rocket from scratch.
+
+<Note>
+  This section assumes you have already [installed OpenRocket](/setup/installation) and are familiar with the [basic layout of the program](/setup/getting-started).
+</Note>
+
+## Component configuration window
+
+To start a new project, go to **File** > **New**. Save the design straight away with **File** > **Save**. You will be presented with a blank rocket design window.
+
+In the top-right of the design window you will find the **Add new component** panel. It contains four categories:
+
+<CardGroup cols={2}>
+  <Card title="Assembly Components" icon="layer-group">
+    Components with no physical meaning of their own. Used to group components together (stages, boosters, pods).
+  </Card>
+  <Card title="Body Components and Fin Sets" icon="rocket">
+    Components that build the rocket's external airframe — nose cones, body tubes, transitions, and fins.
+  </Card>
+  <Card title="Inner Components" icon="circle-dot">
+    Components placed inside the airframe — inner tubes, couplers, centering rings, bulkheads, and engine blocks.
+  </Card>
+  <Card title="Mass Components" icon="weight-hanging">
+    Components that add mass or serve as recovery devices — parachutes, streamers, shock cords, and mass components.
+  </Card>
+</CardGroup>
+
+### Adding a body tube
+
+Click the **Body Tube** icon in the **Body Components and Fin Sets** section. This opens the **Body tube configuration** window.
+
+At the top of the window is the **Component name** field. The name you enter here appears in the design tree in the Rocket Design panel.
+
+Below the name, several tabs are available:
+
+<AccordionGroup>
+  <Accordion title="General">
+    Adjust the basic dimensions of the component using manual entry, spin boxes (coarse control), or sliders (fine control).
+
+    - The **Automatic** checkbox adjusts the component's dimensions automatically based on the parent.
+    - The **Filled** checkbox sets the inner diameter to zero, creating a solid tube. Note how the component mass changes when this is checked.
+    - On the right side, **Component material** and **Component finish** drop-down menus let you select from a list of materials and finishes, each with its own weight and thickness.
+    - The **Set for all** button applies the selected finish to every component in the design.
+    - The live **Component mass** display at the bottom left updates automatically as you change parameter values.
+  </Accordion>
+  <Accordion title="Motor">
+    Most parameters are grayed out unless you check the **This component is a motor mount** checkbox. Enabling this turns the body tube into a motor mount and unlocks motor configuration options.
+  </Accordion>
+  <Accordion title="Override">
+    Manually override the mass and centre of gravity (CG) for this component. This is useful when you have weighed actual parts and want the simulation to reflect real-world measurements. See [Overrides and surface finish](/user-guide/overrides-and-surface-finish) for details.
+  </Accordion>
+  <Accordion title="Appearance">
+    Customize the component's look. The **Figure style** section affects the 2D schematic view. The **Appearance** section affects the 3D rendered view. You can load custom textures through the **Texture** drop-down menu.
+  </Accordion>
+  <Accordion title="Comment">
+    Enter any notes about this component — why you chose specific values, construction notes, and so on.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  The tabs available in the configuration window depend on the component type. For example, a nose cone has a **Shoulder** tab instead of a **Motor** tab.
+</Note>
+
+After you close the Body Tube configuration window, all other component types in the panel become available. However, when building a rocket from scratch, you should always add a **Nose cone** first.
+
+---
+
+## Available design elements
+
+### Assembly components
+
+Assembly components are not physical parts — they are attachment points on which the rocket's framework is built. Each type acts as a container for physical parts and should never be left empty.
+
+| Component | Description |
+|-----------|-------------|
+| **Stage** | The basic framework element. Every rocket has at least one stage. Physical components attach to the stage. |
+| **Boosters** | Attach only to a body tube. Can separate from the rocket during flight. Useful for modeling gliders or separate booster sections. |
+| **Pods** | Attach only to a body tube. Cannot separate during flight. Used for side motors or adjacent airframe sections. |
+
+### Body components and fin sets
+
+These eight components make up the external airframe of the rocket.
+
+| Component | Description |
+|-----------|-------------|
+| **Nose cone** | The tip of the rocket. Usually the first component you add. |
+| **Body tube** | The main cylindrical section of a stage. |
+| **Transition** | Joins one body tube to another, usually of different diameter. |
+| **Trapezoidal fin** | A fin set in a trapezoidal shape. |
+| **Elliptical fin** | A fin set in an elliptical shape. |
+| **Freeform fin** | A fin that can take any custom shape. Adding one opens a shape-editing window. |
+| **Tube fins** | Fins made from body tube sections attached to the outside of the rocket. |
+| **Launch lug** | Attaches to the outside of the body tube and guides the rocket along the launch rod. |
+
+### Inner components
+
+All inner components are placed inside the airframe.
+
+| Component | Description |
+|-----------|-------------|
+| **Inner tube** | Adds tubes inside the main body tube. Can be designated as a motor mount. |
+| **Coupler** | Joins two airframe sections together in multi-stage rockets. |
+| **Centering ring** | Supports internal components (such as a motor mount) at the center of a larger tube. |
+| **Bulkhead** | A solid disc that forms a stop or barrier between two areas. |
+| **Engine block** | Prevents the motor from moving forward in the motor mount tube. |
+
+### Mass components
+
+| Component | Description |
+|-----------|-------------|
+| **Parachute** | Deploys to slow the rocket's descent. |
+| **Streamer** | Creates drag during descent on windier days when drift must be minimized. |
+| **Shock cord** | Secures the nose cone to the body so it is not lost at ejection charge deployment. |
+| **Mass component** | A general-purpose mass block used to adjust the rocket's center of gravity. You can rename it to represent any physical item. |
+
+---
+
+## CG and CP display
+
+As you add and configure components, OpenRocket continuously updates and displays the **Center of Gravity (CG)** and **Center of Pressure (CP)** in real time in the rocket design window. The stability margin — the distance between CG and CP expressed in calibers (body tube diameters) — is shown as well.
+
+Watch these indicators as you adjust component dimensions, materials, and positions. A rocket is stable when the CG is forward of the CP by at least 1.0 caliber for subsonic flights.
+
+---
+
+## Building *A simple model rocket* from scratch
+
+The following steps recreate the *A simple model rocket* example design (**File** > **Open example** > **A simple model rocket**). Start with a new blank project.
+
+<Steps>
+  <Step title="Add the nose cone">
+    Click the **Nose cone** component in **Body Components and Fin Sets**.
+
+    - **Type**: Ogive
+    - **Shape parameter**: 1.0 (produces a tangent ogive)
+    - **Nose cone length**: 10 cm
+    - **Base diameter**: 2.5 cm
+    - **Wall thickness**: 0.2 cm
+    - **Component material**: Polystyrene
+  </Step>
+  <Step title="Configure the nose cone shoulder">
+    In the nose cone configuration window, switch to the **Shoulder** tab.
+
+    - **Diameter**: 2.3 cm
+    - **Length**: 2.0 cm
+    - **Thickness**: 0.2 cm
+    - Check the **End capped** box.
+  </Step>
+  <Step title="Set the nose cone appearance">
+    Switch to the **Appearance** tab. Leave the **Figure style** section unchanged.
+
+    Under **Appearance**, change the colour to something lighter than black and adjust the **Shine** to 50%.
+  </Step>
+  <Step title="Add the body tube">
+    With the nose cone selected in the design tree, click the **Body Tube** component.
+
+    - **Length**: 30.0 cm
+    - **Outer diameter**: 2.5 cm
+    - **Inner diameter**: 2.3 cm
+    - **Wall thickness**: 0.1 cm
+    - Leave **Automatic** and **Filled** unchecked.
+    - **Material**: Cardboard
+    - **Finish**: Regular paint
+  </Step>
+  <Step title="Add the fin set">
+    Select the body tube in the design tree, then click **Trapezoidal** in **Body Components and Fin Sets**.
+
+    Leave the geometry settings as their defaults. On the right side:
+
+    - **Fin cross section**: Rounded
+    - **Thickness**: 0.2 cm
+
+    Optionally customize the appearance.
+  </Step>
+  <Step title="Add the inner tube (motor mount)">
+    Select the body tube and click **Inner tube**.
+
+    - **Length**: 7.5 cm
+    - **Plus** (offset): 0.5 cm
+
+    Switch to the **Motor** tab and check **This component is a motor mount**. Set **Motor overhang** to 0.3 cm. Click **Close**.
+
+    Now click the **Motors & Configuration** tab in the main window. Click **New Configuration**, then left-click in the **Inner Tube** column and click **Select motor**.
+
+    In the motor selection window:
+    - Select **Estes** as the manufacturer.
+    - Set the **Total Impulse** slider to **A**.
+    - Check **Limit motor diameter to mount diameter** and **Limit motor length to mount length**.
+    - Select the **A8** motor and set the **Ejection charge delay** to **3**. Click **OK**.
+
+    Add the following motors as additional configurations (one **New Configuration** each):
+    - Estes B6-4
+    - Estes C6-3
+    - Estes C6-5
+    - Estes C6-7
+  </Step>
+  <Step title="Add the engine block">
+    Select the inner tube in the design tree, then click **Engine block**.
+
+    - **Inner diameter**: 1.2 cm
+    - **Wall thickness**: 0.3 cm
+    - **Position relative to**: Top of the parent component
+    - **Plus**: 0.2 cm
+  </Step>
+  <Step title="Add two centering rings">
+    Select the body tube. Click **Centering ring** to add the first one — leave all settings as defaults.
+
+    Add a comment on the **Comment** tab: *The centering ring automatically takes the outer diameter of the body tube and the inner diameter of the inner tube.*
+
+    Select the body tube again and add a second **Centering ring**.
+
+    - **Plus**: -4.5 cm
+
+    Add the same comment.
+  </Step>
+  <Step title="Add the shock cord">
+    Select the body tube and click **Shock cord**.
+
+    - **Plus**: 2 cm
+    - **Packed length**: 5.2 cm
+    - **Packed diameter**: 1.2 cm
+
+    Add a comment: *The shock cord does not need to be attached to anything in particular, as it functions only as a mass component.*
+  </Step>
+  <Step title="Add the parachute">
+    Select the body tube and click **Parachute**.
+
+    - **Plus**: 3.2 cm
+    - **Packed length**: 4.2 cm
+    - **Packed diameter**: 1.8 cm
+  </Step>
+  <Step title="Add wadding (mass component)">
+    Select the body tube and click **Mass component**.
+
+    - **Mass**: 2 g
+    - **Approximate density**: 0.16 g/cm³
+    - **Length**: 3.0 cm
+    - **Diameter**: 2.3 cm
+    - **Plus**: 8.0 cm
+    - **Name**: Wadding
+  </Step>
+  <Step title="Add the launch lug">
+    Select the body tube and click **Launch lug**.
+
+    - **Length**: 3.5 cm
+    - **Outer diameter**: 0.7 cm
+    - **Inner diameter**: 0.5 cm
+    - **Radial position**: 19 degrees
+  </Step>
+</Steps>
+
+You have now built a complete model rocket in OpenRocket. From here you can proceed to [basic flight simulation](/user-guide/basic-flight-simulation) or experiment with more advanced design techniques.

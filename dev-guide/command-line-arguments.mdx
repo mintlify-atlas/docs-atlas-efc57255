@@ -1,0 +1,79 @@
+---
+title: 'Command line arguments'
+description: 'All JVM system properties supported by OpenRocket, with usage examples.'
+---
+
+OpenRocket accepts a number of JVM system properties that control debug behavior, UI theme, database loading, and more. Pass them with the `-D` flag when launching the JAR.
+
+## Usage
+
+```bash
+# General form — argument with a value
+java -D{argument}={value} -jar OpenRocket.jar
+
+# General form — flag argument (no value required)
+java -D{argument} -jar OpenRocket.jar
+```
+
+### Examples
+
+```bash
+# Set the UI theme to light
+java -Dopenrocket.laf=LIGHT -jar OpenRocket.jar
+
+# Start with extra debugging tools enabled
+java -Dopenrocket.debug -jar OpenRocket.jar
+
+# Start with a custom home directory
+java -Duser.home=/path/to/custom/home -jar OpenRocket.jar
+
+# Bypass motor and preset loading for faster startup
+java -Dopenrocket.bypass.motors -Dopenrocket.bypass.presets -jar OpenRocket.jar
+```
+
+<Note>
+  To find all uses of a given property in the codebase, search for `System.getProperty("argument.name")` in your IDE or with `grep`.
+</Note>
+
+## All supported arguments
+
+| Argument | Description |
+|---|---|
+| `-Dopenrocket.debug` | Start OpenRocket with extra debugging tools. |
+| `-Dopenrocket.debug.prefs` | Use debugging preferences instead of the normal user preferences. |
+| `-Dopenrocket.debug.bugurl={url}` | Override the URL used for bug reporting. |
+| `-Dopenrocket.debug.updateurl={url}` | Override the URL used by the software updater. |
+| `-Duser.home={dir}` | Set the home directory used by OpenRocket for preferences and files. |
+| `-Dos.name` | Override the reported operating system name. |
+| `-Dopenrocket.airstart.altitude` | Set the altitude for air-start simulations. |
+| `-Dopenrocket.debug.safetycheck` | Enable additional runtime safety checks. |
+| `-Dopenrocket.debug.coordinatecount={count}` | Print a log line after every _n_ `Coordinate` object instantiations. |
+| `-Dopenrocket.debug.quaternioncount={count}` | Print a log line after every _n_ `Quaternion` object instantiations. |
+| `-Dopenrocket.3d.disable` | Disable the 3D view. Use this if OpenRocket fails to start due to a 3D rendering problem. |
+| `-Dopenrocket.debug.motordigest` | Enable motor digest debugging output. |
+| `-Dopenrocket.preseteditor.fileMenu` | Activate the experimental component preset editor window. |
+| `-Dopenrocket.debug.fileMenu` | Show the debug file menu with additional developer tools. |
+| `-Duser.country` | Override the user's country for locale selection. |
+| `-Djava.version` | Override the reported Java version. |
+| `-Dopenrocket.ignore-jre` | Skip the JRE version compatibility check at startup. |
+| `-Dopenrocket.laf={theme}` | Set the UI look-and-feel theme. Accepted values: `LIGHT`, `DARK`. |
+| `-Dopenrocket.bypass.presets` | Skip loading the component preset database (faster startup). |
+| `-Dopenrocket.bypass.motors` | Skip loading the motor database (faster startup). |
+| `-Dopenrocket.debug.checkAllVersionUpdates` | Check for all software updates, ignoring any previously dismissed "ignore this update" selections. |
+
+## Development tips
+
+<CardGroup cols={2}>
+  <Card title="Faster startup" icon="forward">
+    Combine `-Dopenrocket.bypass.presets` and `-Dopenrocket.bypass.motors` to skip database loading during development when you do not need motor or preset data.
+  </Card>
+  <Card title="Theme testing" icon="palette">
+    Use `-Dopenrocket.laf=DARK` or `-Dopenrocket.laf=LIGHT` to quickly switch themes without changing your saved preferences.
+  </Card>
+  <Card title="3D rendering problems" icon="cube">
+    If OpenRocket fails to launch due to a JOGL (Java OpenGL) error, add `-Dopenrocket.3d.disable` to bypass the 3D view entirely.
+  </Card>
+  <Card title="Finding arguments in code" icon="magnifying-glass">
+    Search the codebase for `System.getProperty("openrocket.` to locate every place an argument is read and understand its exact effect.
+  </Card>
+</CardGroup>

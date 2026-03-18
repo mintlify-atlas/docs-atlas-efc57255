@@ -1,0 +1,188 @@
+---
+title: 'Building and releasing'
+description: 'How to build OpenRocket with Gradle, create packaged installers with install4j, and publish a new release.'
+---
+
+OpenRocket uses [Gradle](https://gradle.org/) as its build system. Packaged installers for each platform are created with [install4j](https://www.ej-technologies.com/products/install4j/overview.html).
+
+## Gradle build system
+
+Gradle handles compilation, testing, dependency management, and JAR creation. Key features:
+
+- **Incremental builds** — Gradle rebuilds only what has changed.
+- **Dependency management** — handles both project and third-party library dependencies.
+- **Build caching and parallel execution** — speeds up repeated builds.
+
+### Repository structure
+
+| File | Purpose |
+|---|---|
+| `build.gradle` | Root build script: tasks, plugins, dependencies. |
+| `settings.gradle` | Multi-project configuration; declares the `core` and `swing` sub-projects. |
+| `gradle.properties` | Project-wide properties (e.g. version number). |
+| `gradlew` / `gradlew.bat` | Gradle Wrapper scripts. Use these instead of a system-installed Gradle. |
+
+The `core/` and `swing/` sub-projects each have their own `build.gradle` and `gradle.properties`.
+
+### Important Gradle tasks
+
+| Module | Task | Description |
+|---|---|---|
+| root | `clean` | Delete the build directory. |
+| root | `run` | Run the OpenRocket application. |
+| root | `check` | Run unit tests and Checkstyle static analysis. |
+| root | `build` | Compile, test, and create JAR files for both modules. |
+| root | `dist` | Create the distributable JAR at `openrocket/build/libs/OpenRocket-<version>.jar`. |
+| core | `serializeEngines` | Download the latest thrust curves from ThrustCurve.org and rebuild the SQLite motor database. |
+| core | `serializeEnginesDist` | Same as `serializeEngines`, but copies the database to the distribution directory. |
+| core | `submoduleUpdate` | Update the core module's submodule dependencies. |
+
+### Running tasks
+
+<Tabs>
+  <Tab title="macOS / Linux">
+    ```bash
+    ./gradlew run
+    ./gradlew build
+    ./gradlew core:test
+    ```
+  </Tab>
+  <Tab title="Windows">
+    ```bat
+    gradlew.bat run
+    gradlew.bat build
+    gradlew.bat core:test
+    ```
+  </Tab>
+</Tabs>
+
+### Gradle in IntelliJ IDEA
+
+Open the Gradle tool window via **View > Tool Windows > Gradle**. The window shows tasks grouped by module (`info.openrocket`, `core`, `swing`). Task groups include `application`, `build`, `distribution`, `verification`, and `shadow` (fat JAR).
+
+## Thrust curve motor database
+
+The internal motor database is stored as a SQLite file at `core/src/main/resources/datafiles/thrustcurves/thrustcurves.db`. At runtime, OpenRocket prefers the `.db` file and falls back to a legacy `.ser` file if no SQLite database is found.
+
+Rebuild the database before a release:
+
+```bash
+./gradlew core:serializeEngines
+```
+
+User-defined motor directories can also contain `.db` files; OpenRocket validates them against the expected schema before loading.
+
+## Creating installers with install4j
+
+install4j creates the platform-specific installers (Windows `.exe`, macOS `.dmg`, Linux `.deb`/`.rpm`) from the distributable JAR.
+
+<Note>
+  Only OpenRocket administrators have access to the install4j license and code signing certificates.
+</Note>
+
+### Code signing
+
+| Platform | Method |
+|---|---|
+| Windows | Sectigo digital certificate |
+| macOS | Apple Developer ID + notarization (handled by install4j) |
+| Linux | No signing required |
+
+### Building installers
+
+<Steps>
+  <Step title="Build the JAR">
+    ```bash
+    ./gradlew dist
+    ```
+  </Step>
+  <Step title="Open the install4j project">
+    Open install4j and load `openrocket/install4j/<version>/openrocket-<version>.install4j`.
+  </Step>
+  <Step title="Start the build">
+    Go to the **Build** tab and click **Start Build**. Installers are written to `openrocket/install4j/<version>/media/`.
+  </Step>
+</Steps>
+
+<Warning>
+  Enable code signing before building release installers. For macOS, ensure the `DS_Store` file for the DMG is up to date — see the [install4j README](https://github.com/openrocket/openrocket/blob/unstable/install4j/README.md) for instructions.
+</Warning>
+
+If you do not have the signing certificates, enable **Disable code signing** and **Disable notarization** in the Build tab to create unsigned installers for testing.
+
+## Release procedure
+
+<Steps>
+  <Step title="Update release notes">
+    Update `ReleaseNotes.md` with new features, bug fixes, and the version number and release date.
+  </Step>
+  <Step title="Update databases">
+    Run `./gradlew core:submoduleUpdate` and `./gradlew core:serializeEngines` to pull the latest component database and thrust curves.
+  </Step>
+  <Step title="Regenerate example files">
+    Open each example design in `core/src/main/resources/datafiles/examples/` and overwrite the saved results to keep them in sync with the latest simulation engine.
+  </Step>
+  <Step title="Update the version number">
+    Edit `openrocket/core/src/main/resources/build.properties`. Use the format `YY.MM` (for example, `23.09` for September 2023).
+
+    For pre-releases, append the stage:
+    - Alpha: `23.09.alpha.01`
+    - Beta: `23.09.beta.01`
+    - Release candidate: `23.09.RC.01`
+
+    The final release version matches the beta/RC version without the suffix (e.g., `23.09`).
+  </Step>
+  <Step title="Build and test the JAR">
+    Run `./gradlew dist` and verify that the correct version appears on the splash screen and under **Help > About**.
+  </Step>
+  <Step title="Create and test installers">
+    Build the signed installers with install4j and test them on each target platform.
+  </Step>
+  <Step title="Prepare the website (official releases only)">
+    In the [website repository](https://github.com/openrocket/openrocket.github.io) on the `development` branch:
+    - Add the release to `assets/downloads_config.json`.
+    - Update `current_version` in `_config.yml`.
+    - Add a `_whats-new/wn-<version>.md` file.
+    - Update the release notes include.
+
+    <Warning>Always update the `development` branch first. Merge to `master` only after verifying the changes on the staging site.</Warning>
+  </Step>
+  <Step title="Publish on GitHub">
+    Go to the [releases page](https://github.com/openrocket/openrocket/releases) and click **Draft a new release**.
+
+    - Tag: `release-<version>` (e.g., `release-23.09`)
+    - Title: `OpenRocket <version> (<YYYY-MM-DD>)`
+    - Body: content from `ReleaseNotes.md`; tag contributors with `@username`
+    - Attach all installers and the JAR file
+    - For pre-releases, tick **Set as a pre-release**
+  </Step>
+  <Step title="Push website changes">
+    Build the `development` branch locally to verify download links and release notes, then merge it to `master`.
+  </Step>
+  <Step title="Send the release announcement">
+    Post to the OpenRocket mailing list, TRF forum, Discord, and Facebook with a summary of new features and download links.
+  </Step>
+  <Step title="Merge unstable to master">
+    Merge the `unstable` branch into `master` on the main repository.
+  </Step>
+  <Step title="Upload to SourceForge">
+    Upload the new installers and JAR to the [SourceForge project page](https://sourceforge.net/projects/openrocket/), which remains heavily used.
+  </Step>
+  <Step title="Update package managers">
+    Update snap, Chocolatey, Homebrew, and any other package manager distributions.
+  </Step>
+</Steps>
+
+## Snap package
+
+The snap package is built automatically by [Snapcraft](https://snapcraft.io/), but the `latest/stable` release channel must be promoted manually after each release.
+
+```bash
+# Build the snap package (runs on Snapcraft's remote build infrastructure)
+snapcraftremote-build
+
+# Publish to the stable channel (run once per architecture)
+snapcraft upload --release=stable openrocket_<version>_<arch>.snap
+```
+
+Replace `--release=stable` with `candidate` or `beta` for pre-release channels.

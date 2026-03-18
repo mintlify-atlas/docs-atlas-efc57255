@@ -1,0 +1,315 @@
+---
+title: 'Using OpenRocket core'
+description: 'Integrate the OpenRocket core module into your own Java applications without any Swing GUI dependencies.'
+---
+
+The OpenRocket core module provides the fundamental rocket simulation functionality as a standalone library. You can embed it in your own Java applications to design rockets, run simulations, and load or save `.ork` files — all without any GUI code.
+
+The core module includes:
+
+- Rocket design and component models
+- Flight simulation engine
+- Motor and component databases
+- Internationalization (i18n) support
+- Preferences management
+
+## Adding the dependency
+
+<Tabs>
+  <Tab title="Maven">
+    ```xml
+    <dependency>
+        <groupId>info.openrocket</groupId>
+        <artifactId>openrocket-core</artifactId>
+        <version>YOUR_VERSION</version>
+    </dependency>
+    ```
+  </Tab>
+  <Tab title="Gradle">
+    ```groovy
+    implementation 'info.openrocket:openrocket-core:YOUR_VERSION'
+    ```
+  </Tab>
+</Tabs>
+
+## Initializing OpenRocket core
+
+Before using any OpenRocket functionality, you must initialize the core module. The `OpenRocketCore` helper class is the simplest way to do this.
+
+### Basic initialization
+
+```java
+import info.openrocket.core.startup.OpenRocketCore;
+import info.openrocket.core.startup.Application;
+
+public class MyApplication {
+    public static void main(String[] args) {
+        // Initialize OpenRocket core
+        OpenRocketCore.initialize();
+
+        // Access core services
+        Translator translator = Application.getTranslator();
+        ApplicationPreferences prefs = Application.getPreferences();
+        MotorDatabase motorDb = Application.getMotorSetDatabase();
+    }
+}
+```
+
+`OpenRocketCore.initialize()` is idempotent — calling it more than once is safe. Subsequent calls are silently ignored.
+
+### Initialization with custom Guice modules
+
+For more control over the dependency injection setup, pass additional Guice modules to `initialize()`:
+
+```java
+import info.openrocket.core.startup.OpenRocketCore;
+import info.openrocket.core.plugin.PluginModule;
+import com.google.inject.AbstractModule;
+
+public class MyApplication {
+    public static void main(String[] args) {
+        AbstractModule customModule = new AbstractModule() {
+            @Override
+            protected void configure() {
+                // Your custom bindings here
+            }
+        };
+
+        // Initialize with custom modules
+        OpenRocketCore.initialize(new PluginModule(), customModule);
+    }
+}
+```
+
+### Manual initialization
+
+If you need full control over the initialization process, you can configure the Guice injector directly:
+
+```java
+import info.openrocket.core.startup.Application;
+import info.openrocket.core.startup.CoreModule;
+import info.openrocket.core.plugin.PluginModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+
+public class MyApplication {
+    public static void main(String[] args) {
+        // Create the core module
+        CoreModule coreModule = new CoreModule();
+
+        // Create injector with required modules
+        Injector injector = Guice.createInjector(
+            coreModule,
+            new PluginModule()
+        );
+
+        // Set the injector in the Application class
+        Application.setInjector(injector);
+
+        // Start loading databases
+        coreModule.startLoader();
+
+        // Now you can use OpenRocket functionality
+    }
+}
+```
+
+## Loading and saving rockets
+
+### Loading a rocket from a file
+
+Use `GeneralRocketLoader` to load any supported file format (`.ork`, `.rkt`):
+
+```java
+import info.openrocket.core.file.GeneralRocketLoader;
+import info.openrocket.core.document.OpenRocketDocument;
+import info.openrocket.core.rocketcomponent.Rocket;
+import java.io.File;
+
+private Rocket loadRocketFromFile(File file) {
+    try {
+        GeneralRocketLoader loader = new GeneralRocketLoader(file);
+        OpenRocketDocument document = loader.load();
+        return document.getRocket();
+    } catch (Exception e) {
+        System.err.println("Failed to load rocket from file: " + e.getMessage());
+        return null;
+    }
+}
+```
+
+### Saving a rocket to a file
+
+```java
+import info.openrocket.core.file.GeneralRocketSaver;
+import java.io.File;
+
+private void saveRocketToFile(OpenRocketDocument document, File file) {
+    try {
+        GeneralRocketSaver saver = new GeneralRocketSaver(file);
+        saver.save(document);
+    } catch (Exception e) {
+        System.err.println("Failed to save rocket to file: " + e.getMessage());
+    }
+}
+```
+
+## Creating a rocket programmatically
+
+Use `OpenRocketDocumentFactory` to create a new blank document, then add components to the stage tree:
+
+```java
+import info.openrocket.core.document.OpenRocketDocument;
+import info.openrocket.core.document.OpenRocketDocumentFactory;
+import info.openrocket.core.rocketcomponent.*;
+
+private OpenRocketDocument createNewRocket() {
+    // Create a new document and get the rocket
+    OpenRocketDocument document = OpenRocketDocumentFactory.createNewRocket();
+    Rocket rocket = document.getRocket();
+    AxialStage stage = rocket.getStage(0);
+
+    // Nose cone
+    NoseCone noseCone = new NoseCone();
+    noseCone.setShapeType(Transition.Shape.OGIVE);
+    noseCone.setShapeParameter(1.0);
+    noseCone.setLength(0.15);           // 15 cm
+    noseCone.setBaseRadius(0.025);      // 2.5 cm radius
+    noseCone.setThickness(0.002);       // 2 mm wall
+    stage.addChild(noseCone);
+
+    // Body tube
+    BodyTube bodyTube = new BodyTube();
+    bodyTube.setLength(0.2);            // 20 cm
+    bodyTube.setOuterRadius(0.025);     // 2.5 cm radius
+    bodyTube.setThickness(0.002);       // 2 mm wall
+    stage.addChild(bodyTube);
+
+    // Transition (boat tail)
+    Transition transition = new Transition();
+    transition.setLength(0.1);
+    transition.setForeRadius(0.025);
+    transition.setAftRadius(0.01);
+    transition.setShapeType(Transition.Shape.OGIVE);
+    transition.setShapeParameter(1.0);
+    stage.addChild(transition);
+
+    // Trapezoidal fin set
+    TrapezoidFinSet finSet = new TrapezoidFinSet();
+    finSet.setHeight(0.05);
+    finSet.setRootChord(0.08);
+    finSet.setSweep(0.05);
+    finSet.setFinCount(3);
+    finSet.setThickness(0.005);
+    finSet.setAxialMethod(AxialMethod.BOTTOM);
+    finSet.setAxialOffset(0);
+    bodyTube.addChild(finSet);
+
+    return document;
+}
+```
+
+## Running simulations
+
+The following example shows how to build a minimal rocket and configure a simulation:
+
+```java
+import info.openrocket.core.rocketcomponent.*;
+import info.openrocket.core.simulation.*;
+import info.openrocket.core.startup.OpenRocketCore;
+
+public class RocketSimulationExample {
+    public static void main(String[] args) {
+        OpenRocketCore.initialize();
+
+        // Build a simple rocket
+        Rocket rocket = new Rocket();
+        Stage stage = new Stage();
+        rocket.addChild(stage);
+
+        NoseCone noseCone = new NoseCone();
+        noseCone.setLength(0.1);            // 10 cm
+        stage.addChild(noseCone);
+
+        BodyTube bodyTube = new BodyTube();
+        bodyTube.setLength(0.3);            // 30 cm
+        bodyTube.setOuterRadius(0.025);     // 2.5 cm radius
+        stage.addChild(bodyTube);
+
+        InnerTube motorMount = new InnerTube();
+        motorMount.setLength(0.07);         // 7 cm
+        motorMount.setOuterRadius(0.012);   // 1.2 cm radius
+        bodyTube.addChild(motorMount);
+
+        // Create and configure a simulation
+        Simulation simulation = new Simulation(rocket);
+        SimulationOptions options = simulation.getOptions();
+        // Configure motor, recovery, launch conditions, etc.
+
+        System.out.println("Rocket created successfully!");
+    }
+}
+```
+
+## Configuration via system properties
+
+You can tune OpenRocket's startup behavior using Java system properties. Set these **before** calling `OpenRocketCore.initialize()`:
+
+```java
+// Skip loading component presets (faster startup)
+System.setProperty("openrocket.bypass.presets", "true");
+
+// Skip loading motor database (faster startup)
+System.setProperty("openrocket.bypass.motors", "true");
+
+// Set a custom locale
+System.setProperty("openrocket.locale", "en_US");
+
+// Enable debug mode
+System.setProperty("openrocket.debug", "true");
+```
+
+<Tip>
+  Use `openrocket.bypass.presets` and `openrocket.bypass.motors` during development to skip slow database loading when you don't need motor or preset data.
+</Tip>
+
+## Thread safety
+
+<Warning>
+  OpenRocket core components are **not thread-safe** in general. Observe the following rules when using OpenRocket from multiple threads:
+</Warning>
+
+1. Call `OpenRocketCore.initialize()` from the main thread before spawning any other threads.
+2. Use proper synchronization when accessing shared OpenRocket objects from multiple threads.
+3. Where possible, create separate component instances per thread rather than sharing them.
+
+## Best practices
+
+<CardGroup cols={2}>
+  <Card title="Initialize once" icon="power-off">
+    Call `OpenRocketCore.initialize()` exactly once at application startup. Multiple calls are safe but unnecessary.
+  </Card>
+  <Card title="Handle exceptions" icon="triangle-exclamation">
+    Database loading can fail if resource files are missing. Wrap initialization in try/catch and handle failures gracefully.
+  </Card>
+  <Card title="Use dependency injection" icon="syringe">
+    Access services through `Application.getInjector()` rather than instantiating them directly.
+  </Card>
+  <Card title="Monitor memory" icon="memory">
+    OpenRocket loads significant data at startup. Monitor heap usage in long-running applications and consider using the bypass properties when data is not needed.
+  </Card>
+</CardGroup>
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title='"Application.injector is null" error'>
+    You called an OpenRocket API before calling `OpenRocketCore.initialize()`. Always initialize the core module before accessing any services.
+  </Accordion>
+  <Accordion title="ClassNotFoundException or NoClassDefFoundError">
+    Not all required dependencies are on the classpath. The core module depends on Google Guice and several other libraries. Ensure your build tool resolves transitive dependencies correctly.
+  </Accordion>
+  <Accordion title="Database loading issues">
+    Component preset and motor database files must be accessible on the classpath. During development, use the `openrocket.bypass.presets` and `openrocket.bypass.motors` system properties to skip database loading entirely.
+  </Accordion>
+</AccordionGroup>

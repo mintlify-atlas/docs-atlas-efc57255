@@ -1,0 +1,160 @@
+---
+title: Features
+description: A complete overview of OpenRocket's current capabilities, planned features, and a comparison with RockSim.
+---
+
+This page lists the current features of OpenRocket (as of version 23.09) and compares them to those of RockSim.
+
+## Current features
+
+### General
+
+<CardGroup cols={2}>
+  <Card title="Cross-platform" icon="globe">
+    Fully cross-platform, written in Java. Runs on Windows, macOS, and Linux.
+  </Card>
+  <Card title="Open source" icon="code-branch">
+    Source code is available on GitHub under the GNU GPL v3 license.
+  </Card>
+  <Card title="Export formats" icon="file-export">
+    Export designs to RockSim (`.rkt`) and RASAero II (`.CDX1`) formats.
+  </Card>
+  <Card title="3D printing" icon="cube">
+    Export any component to an OBJ file for 3D printing.
+  </Card>
+  <Card title="Extensible" icon="puzzle-piece">
+    Extend simulations with custom simulation listeners, expressions, and plugins.
+  </Card>
+  <Card title="Documented methods" icon="book">
+    All simulation methods are fully documented in the technical documentation.
+  </Card>
+</CardGroup>
+
+### User interface
+
+- Intuitive user interface
+- **Real-time view of CG and CP** position as you design
+- **Real-time flight altitude, velocity, and acceleration** from a continuous background simulation
+- Zoomable schematic view from the side or rear, with rotation around the center axis
+
+### Design
+
+- A multitude of available components to choose from
+- **Trapezoidal, elliptical, free-form, and tube fins** supported
+- Support for **canted fins** (roll stabilization)
+- **Staging** and **clustering** support
+- **Pods** support
+- Automatic calculation of component mass and CG based on shape and density
+- Ability to **override mass, CG, and CD** of components or stages separately
+
+### Simulation and analysis
+
+- Full **six degree of freedom** simulation
+- Rocket stability computed using the **extended Barrowman** method
+- **Automatic design optimization** — optimize any number of rocket parameters for flight altitude, maximum velocity, or other values
+- Realistic wind modeling
+- Analysis of the **effect of separate components** on stability, drag, and roll characteristics
+- **Fully configurable plotting** with various preset configurations
+- Simulation data can be **exported to CSV** files for further analysis
+- **Simulation listeners** allowing custom-made code to interact with the rocket during flight simulation
+
+---
+
+## Planned future features
+
+<Note>
+  OpenRocket is developed in contributors' free time. If you want to help improve it, see the [Contribute](/introduction/contribute) page.
+</Note>
+
+The following major features are under consideration:
+
+- Better support for transonic and supersonic simulations
+- Monte Carlo simulation for dispersion analysis
+- Fin flutter simulation
+- Customized support for hybrid rocket motors and water rockets
+- Importing and plotting actual flight data from altimeters
+- Rocket flight animation
+- A wizard for creating new rocket designs
+- More advanced rocket optimization methods
+- Import CD and CP data from other programs (e.g. RASAero)
+
+For a full list of planned features, see the [GitHub issue tracker](https://github.com/openrocket/openrocket/issues).
+
+---
+
+## Comparison to RockSim
+
+[RockSim](https://www.apogeerockets.com/Rocket_Software/RockSim) is a commercial rocket design and simulation program priced at $124. OpenRocket is free and open source. The tables below compare the two programs objectively.
+
+### General
+
+| Feature | OpenRocket | RockSim |
+|---|---|---|
+| License | Open source (GPLv3) | Proprietary |
+| Price | Free | $124 |
+| Supported platforms | Windows, Mac, Linux | Windows, Mac |
+| Supported file formats | ORK, RKT, CDX1 | RKT |
+| Anti-piracy copy protection | None | PACE |
+
+### UI features
+
+| Feature | OpenRocket | RockSim |
+|---|---|---|
+| Side/back view | Yes | Yes |
+| 3D view | Yes | Yes |
+| Photorealistic 3D rendering | Yes | No |
+| Export 3D design | Yes (OBJ) | Yes (3DS) |
+| Design view rotation | Any angle | Side and top only |
+| Live CG/CP view | Yes | Yes |
+| Realtime simulation | Yes | No |
+
+### Design features
+
+| Feature | OpenRocket | RockSim |
+|---|---|---|
+| Basic components | Yes | Yes |
+| Freeform fins | Yes | Yes |
+| Asymmetric fin configurations | Yes | Yes |
+| Tube fins | Yes | Yes |
+| Ring-tail fins | No | Yes |
+| Fins attached to fins | No | Yes |
+| External pods | Yes | Yes |
+| Canted fins / roll stabilization | Yes | No |
+| Standard component libraries | Yes | Yes |
+| Decals | Yes | Yes |
+| Clustering support | Yes, modifiable | Yes, one-time wizard only |
+| Staging support | Yes, unlimited | Yes, 3 stages |
+
+### Simulation features
+
+| Feature | OpenRocket | RockSim |
+|---|---|---|
+| Degrees of freedom | 6DOF | 3DOF |
+| Geodetic calculation (Earth coordinates, Coriolis effect) | Yes | No |
+| Simulations extensible by own code | Yes | No |
+| Simulation animation | No | Yes |
+| Plotting any simulated variables | Yes | Yes |
+| Exporting simulated data | Yes | Yes |
+| Computing custom variables | Yes | No |
+
+### Optimization and analysis
+
+| Feature | OpenRocket | RockSim |
+|---|---|---|
+| General design optimization | Yes | No |
+| Mass optimization | Yes (using general optimizer) | Yes |
+| Stability analysis | Yes, per component | Yes, per stage |
+| Drag analysis | Yes, per component | Yes, per stage |
+| Roll analysis | Yes | No |
+
+### Printing
+
+| Feature | OpenRocket | RockSim |
+|---|---|---|
+| Schematic view | Yes | Yes |
+| Stability information | Yes | Yes |
+| Simulation results | Yes | Yes |
+| Parts list | Yes | Yes |
+| Component templates | Nose cone, fin sets, centering rings | Nose cone, fin sets, centering rings |
+| Fin placement guide | Yes | No |
+| Export to PDF | Yes | No |

@@ -1,0 +1,146 @@
+---
+title: 'Testing and debugging'
+description: 'Unit testing with JUnit 5, code coverage with JaCoCo, and debugging techniques for OpenRocket development.'
+---
+
+This guide covers how to write, run, and debug tests in the OpenRocket codebase.
+
+## Unit testing
+
+OpenRocket uses [JUnit 5 (Jupiter)](https://junit.org/junit5/) as its testing framework. Tests are organized in separate source trees from production code:
+
+- `core/src/test/java` — tests for core functionality
+- `swing/src/test/java` — tests for Swing UI components
+
+### Running tests
+
+```bash
+# Run all tests
+./gradlew test
+
+# Run tests for a specific module
+./gradlew core:test
+./gradlew swing:test
+
+# Run a specific test class
+./gradlew core:test --tests "info.openrocket.core.util.MathUtilTest"
+```
+
+### Test structure
+
+Tests in OpenRocket follow standard JUnit 5 conventions:
+
+- Test class names end with `Test` (for example, `MathUtilTest`)
+- Test methods are annotated with `@Test`
+- Many tests extend `BaseTestCase`, which provides common setup and utilities
+
+### Example test
+
+```java
+package info.openrocket.core.util;
+
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ExampleTest extends BaseTestCase {
+
+    @Test
+    public void testSomeFeature() {
+        // Arrange
+        SomeClass instance = new SomeClass();
+
+        // Act
+        int result = instance.someMethod();
+
+        // Assert
+        assertEquals(42, result);
+    }
+}
+```
+
+### Writing good tests
+
+<Steps>
+  <Step title="Test one thing per method">
+    Each test method should verify a single behavior. This makes failures easy to diagnose and keeps test names meaningful.
+  </Step>
+  <Step title="Use descriptive names">
+    Name test methods so that the failure message explains exactly what is broken — for example, `testNoseConeVolumeWithZeroLength`.
+  </Step>
+  <Step title="Follow Arrange-Act-Assert">
+    Structure your test body in three sections: set up the state, execute the code under test, then assert the outcome.
+  </Step>
+  <Step title="Mock external dependencies">
+    Isolate the unit under test by mocking databases, file system access, or other external services.
+  </Step>
+  <Step title="Test edge cases and error conditions">
+    Cover boundary values, null inputs, and exception paths — not just the happy path.
+  </Step>
+  <Step title="Keep tests independent">
+    Tests must not share mutable state. Each test should be able to run in any order and produce the same result.
+  </Step>
+</Steps>
+
+## Code coverage
+
+OpenRocket uses [JaCoCo](https://www.jacoco.org/) to track and enforce test coverage. Coverage verification runs automatically during JAR packaging.
+
+| Module | Coverage threshold |
+|---|---|
+| `core` | 60% minimum |
+| `swing` | Disabled (0%) — limited test coverage |
+
+<Warning>
+  If the `core` module falls below the 60% coverage threshold, JAR packaging will fail. Fix failing or missing tests before merging.
+</Warning>
+
+### Generating coverage reports
+
+```bash
+# Generate an aggregate coverage report
+./gradlew test jacocoRootReport
+
+# Run the full build (includes coverage verification)
+./gradlew build
+```
+
+After running, HTML reports are available at:
+
+- `build/reports/jacoco/` — aggregate report
+- `core/build/reports/jacoco/` — core module report
+- `swing/build/reports/jacoco/` — Swing module report
+
+<Tip>
+  A GitHub Actions workflow publishes coverage reports automatically on every push to the main branch, making it easy to track coverage trends over time.
+</Tip>
+
+## Debugging
+
+The most effective debugging tool is your IDE's built-in debugger. Both IntelliJ IDEA and Eclipse offer full Java debugging support.
+
+<Steps>
+  <Step title="Set breakpoints">
+    Click in the gutter next to the line you want to pause on. Conditional breakpoints let you pause only when a specific expression evaluates to true — useful in tight loops.
+  </Step>
+  <Step title="Run in debug mode">
+    In IntelliJ IDEA, use the debug run configuration (the bug icon) instead of the normal run. In Eclipse, choose **Run > Debug As > Java Application**.
+  </Step>
+  <Step title="Inspect variables and call stack">
+    When execution pauses at a breakpoint, inspect local variables in the **Variables** panel and navigate the call stack in the **Debug** panel. Use **Evaluate Expression** to run arbitrary code at the breakpoint.
+  </Step>
+</Steps>
+
+### Useful command-line debug flags
+
+Several JVM system properties help during debugging. See [Command line arguments](/dev-guide/command-line-arguments) for the full list. The most useful ones are:
+
+```bash
+# Enable extra debug tools in the UI
+java -Dopenrocket.debug -jar OpenRocket.jar
+
+# Show the debug file menu
+java -Dopenrocket.debug.fileMenu -jar OpenRocket.jar
+
+# Enable additional runtime safety checks
+java -Dopenrocket.debug.safetycheck -jar OpenRocket.jar
+```

@@ -1,0 +1,208 @@
+---
+title: Getting started
+description: A tour of the OpenRocket user interface and a step-by-step walkthrough of building your first rocket design.
+---
+
+This section explains how OpenRocket is organized by walking through the user interface in detail. It also covers the example projects included with OpenRocket. After reading this section you will understand how OpenRocket is structured and will be ready to design your own rockets.
+
+---
+
+## The user interface
+
+The OpenRocket window is divided horizontally into four sections:
+
+- **Main Menu** — located at the top of the window (on macOS, embedded in the native menu bar)
+- **Task tabs** — switches between Rocket Design, Motors & Configuration, and Flight Simulations
+- **Work pane** — the Rocket Design, Motors & Configuration, or Flight Simulations panel
+- **Rocket views pane** — 2D and 3D views of the rocket
+
+### Main menu
+
+<Tabs>
+  <Tab title="File">
+    The **File** menu is divided into five functional sections:
+
+    1. **File opening options**
+       - **New** — Start a new project without closing the current one
+       - **Open...** — Open a previously saved `.ork` file
+       - **Open Recent** — Open a recently opened file
+       - **Open Example** — Select and open an example project included with OpenRocket
+
+    2. **File saving options**
+       - **Save** — Save changes to the current project
+       - **Save as...** — Save the project with a different filename or location
+
+    3. **Import and export options**
+       - **Export as** — Export the project to a different format (e.g. RockSim 10 `.rkt`)
+       - **Save decal image** — Save a decal image file used in the project
+       - **Print design info...** — Print or export component details, fin templates, or the rocket design to PDF
+
+    4. **Closing** — **Close design** exits the current project (prompts to save unsaved changes)
+
+    5. **Quitting** — **Quit** exits OpenRocket, saving each open project if necessary
+  </Tab>
+  <Tab title="Edit">
+    The **Edit** menu provides:
+
+    - **Undo** and **Redo** — Step through your action history
+    - **Cut**, **Copy**, **Paste**, **Delete** — Standard clipboard operations on components
+    - **Scale** — Scale components or the entire rocket
+    - **Preferences** — Access OpenRocket system preferences
+  </Tab>
+  <Tab title="Tools">
+    The **Tools** menu provides specialized design tools:
+
+    - **Component Analysis** — Analyze the aerodynamic effect of specific components
+    - **Rocket optimization** — Optimize particular rocket characteristics
+    - **Custom expressions** — Create custom expressions for specialized analysis
+    - **Photo Studio** — Display the rocket in 3D with a variety of backgrounds and visual effects
+  </Tab>
+  <Tab title="Help">
+    The **Help** menu is divided into three sections:
+
+    - **Guided tours** — Demonstrations of OpenRocket features
+    - **Bug reporting** and **Debug log** — Tools to help you provide feedback to the developers
+    - **License** and **About** — General information about OpenRocket and the installed version
+  </Tab>
+</Tabs>
+
+### Task tabs
+
+**Rocket Design**
+
+The Rocket Design tab is divided into three sections:
+
+- *(Left)* The **component tree** — a hierarchical view of all components in the rocket
+- *(Middle)* **Component action buttons** — edit, move, or delete the currently selected component
+- *(Right)* **Component addition buttons** — add new components to the rocket
+
+Components are organized into four classes:
+
+1. Assembly components
+2. Body components and fin sets (external)
+3. Internal components
+4. Mass components (including electronics and recovery)
+
+Component buttons are greyed out when they cannot be added to the currently selected component. As you add components the tree grows to reflect the structure of your design.
+
+**Motors & Configuration**
+
+The Motors & Configuration tab is where you select motors, recovery events, and stage timing. From here you can create, rename, copy, and remove flight configurations. With a configuration selected, you can choose or remove motors and set ignition timing.
+
+**Flight simulations**
+
+The Flight Simulations tab is where you manage and run simulations. From here you can add, edit, run, and delete simulations. Selecting a simulation lets you plot and export the results.
+
+### Rocket views
+
+| View | Description |
+|---|---|
+| Side view | Blueprint-style line drawing showing all components from the side |
+| Back view | Blueprint-style line drawing showing the rocket from behind |
+| Top view | Blueprint-style line drawing showing the rocket from above |
+| 3D Figure | Semi-transparent 3D view showing interior components |
+| 3D Unfinished | Cutaway 3D view to see interior component relationships |
+| 3D Finished | Full 3D render showing what the completed rocket will look like |
+
+---
+
+## Explore the example designs
+
+Before building your own design, it is strongly recommended to open one of the included example designs, explore how it is assembled, make some changes, and run a simulation. The example designs are accessed from **File** > **Open Example**.
+
+<AccordionGroup>
+  <Accordion title="Standard designs">
+    - **A simple model rocket** — A basic rocket design with all standard elements including recovery and multiple motor configurations. Good starting point for new users.
+    - **Two-stage rocket** — A two-stage rocket design.
+    - **Three-stage rocket** — A three-stage rocket design.
+    - **TARC payload rocket** — Demonstrates payload and booster sections with individual recovery systems deployed by motor ejection (TARC = Team America Rocketry Challenge).
+    - **3D Printable Nose Cone and Fins** — Tests exporting nose cone and fins to an OBJ file for 3D printing.
+  </Accordion>
+  <Accordion title="Advanced designs">
+    - **Airstart timing** — Demonstrates the effect of different airstart timings on overall altitude.
+    - **Base drag hack (short-wide)** — Demonstrates the base drag hack for rockets with a length-to-diameter ratio of less than 10:1.
+    - **Chute release** — A simple rocket adapted to use an electronic chute release.
+    - **Dual parachute deployment** — A fiberglass zipperless dual deploy rocket.
+    - **Clustered motors** — A rocket design with clustered motors.
+    - **Parallel booster staging** — Demonstrates parallel booster staging.
+    - **Pods — airframes and winglets** — Demonstrates two uses of pods: traditional wing pods and a phantom body tube for fins-on-fins.
+    - **Pods — powered with recovery deployment** — Demonstrates pods for powered recovery deployment.
+  </Accordion>
+  <Accordion title="Simulation scripting designs">
+    - **Simulation extensions** — Active roll control and air-start using simulation extensions. The main fins are slightly misaligned to induce roll.
+    - **Simulation scripting** — Active roll control and air-start using a simulation extension written in JavaScript.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Building your first rocket
+
+The following walkthrough builds a simple rocket from scratch to introduce you to the core workflow.
+
+<Steps>
+  <Step title="Configure the rocket">
+    Double-click the **Rocket** label at the top of the component tree to open the **Rocket configuration** window. Enter a name for your design, the designer name, and any comments. Click **Close** when done.
+  </Step>
+
+  <Step title="Add a nose cone">
+    With **Stage** selected in the component tree, click the **Nose Cone** button. In the **Nose Cone configuration** window, click **Parts Library** (top-right) to open the component preset window and select a nose cone from the built-in catalog. Click **Close** to confirm.
+  </Step>
+
+  <Step title="Add a payload bay">
+    With **Stage** or **Nose Cone** selected, click the **Body Tube** button. Click **Parts Library** to choose a body tube from the preset catalog. Click **Close** to add it.
+  </Step>
+
+  <Step title="Add a transition">
+    With **Stage** or the payload bay selected, click the **Transition** button. On the **General** tab, configure the transition dimensions. Switch to the **Shoulder** tab and set shoulder dimensions. Click **Close**.
+  </Step>
+
+  <Step title="Add a main body tube">
+    Repeat the same steps as adding the payload bay — click **Body Tube**, then **Parts Library** to select the tube. Click **Close**.
+  </Step>
+
+  <Step title="Add fins">
+    With the main **Body Tube** selected, click **Trapezoidal** fins. Configure the fin dimensions on the **General** tab. Click **Close**. The fins will appear nested under the body tube in the component tree.
+  </Step>
+
+  <Step title="Add a launch guide">
+    With the **Body Tube** selected, open the **Launch Lug** configuration window. Set the specifications and click **Close**.
+  </Step>
+
+  <Step title="Add recovery components">
+    With the **Body Tube** selected, add a **Parachute** and a **Shock Cord**. Both attach to the body tube. Use **Parts Library** for the parachute to select from the preset catalog.
+  </Step>
+
+  <Step title="Add an engine block">
+    With the **Body Tube** selected, add an **Engine Block** and configure its dimensions. Click **Close**.
+  </Step>
+
+  <Step title="Select a motor">
+    Switch to the **Motors & Configuration** tab. Click **New Configuration** to create a flight configuration and open the Motor Selection window. Choose a motor (for example, the Estes D-12-7) and click **OK**.
+  </Step>
+
+  <Step title="Run a simulation">
+    Switch to the **Flight Simulations** tab. Click **New simulation** and then **Run**. Once complete, select the simulation and click **Plot / export** to view the results.
+  </Step>
+
+  <Step title="View in Photo Studio">
+    Open **Tools** > **Photo Studio** to view your rocket in 3D. On the **Effects** tab, enable the **Flame** effect to see a simulated motor plume. (The flame effect requires a motor to be configured.)
+  </Step>
+</Steps>
+
+---
+
+## Adding appearance settings
+
+To make your design visually match what you plan to build, switch to the **3D Finished** view and customize component appearances.
+
+- Double-click a component in the tree to open its configuration window, then select the **Appearance** tab.
+- Uncheck **Use default** to enable custom appearance settings.
+- Click the **Color** box to choose a color for the component.
+- For body tubes and fins, set **Texture** to `<none>` unless you want to apply a decal.
+- To create a transparent component, set **Opacity** to a low value (e.g. 20%).
+- To add a decal, set **Texture** to **From file...** and navigate to your decal image. Set the **Repeat** type to **Sticker** for a single placement, then adjust **Scale** and **Offset** to position it.
+
+<Tip>
+  After splitting fins into individual instances and applying per-fin decals, save and reopen the design file before viewing in 3D Finished to ensure decals render correctly.
+</Tip>

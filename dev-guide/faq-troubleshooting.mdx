@@ -1,0 +1,155 @@
+---
+title: 'FAQ and troubleshooting'
+description: 'Frequently asked questions and troubleshooting tips for developers working with the OpenRocket codebase.'
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Why does OpenRocket still use Java? Python and web-based programs are the future.">
+    Java is a powerful, mature language still widely used in industry. Rewriting the entire codebase in another language would require more time than the volunteer developer team can afford. The current Java codebase is stable and has been tested extensively by the community over many years.
+
+    That said, maintaining a Java application does present challenges — particularly ensuring it runs correctly across all platforms and hardware configurations, and sustaining the Swing GUI and 3D view. Java also cannot run on mobile platforms such as iOS. If you are interested in helping with a future migration effort, contact the OpenRocket developers.
+  </Accordion>
+
+  <Accordion title="How do I set up my development environment?">
+    See the [Development setup](/dev-guide/development-setup) guide for step-by-step instructions covering Java, Gradle, Git, and IDE configuration.
+  </Accordion>
+
+  <Accordion title="How do I run OpenRocket from source?">
+    After setting up your development environment, run OpenRocket using Gradle:
+
+    ```bash
+    ./gradlew run
+    ```
+
+    Alternatively, run the `main` method in your IDE from either:
+    - `swing/src/main/java/info/openrocket/swing/startup/SwingStartup.java`
+    - `swing/src/main/java/info/openrocket/swing/startup/OpenRocket.java`
+  </Accordion>
+
+  <Accordion title="How do I contribute to OpenRocket?">
+    See the [Development guidelines](/dev-guide/development-guidelines) for the full contribution process, including branch strategy, commit etiquette, and pull request format. Key points:
+
+    - Comment on an issue before starting work to avoid duplicate effort.
+    - Use atomic commits — one fix or feature per commit.
+    - Name commits in the format `[#<issue>] Brief description`.
+    - Structure pull request descriptions as: problem, root cause, fix.
+  </Accordion>
+
+  <Accordion title="Where can I find the API documentation?">
+    See the [API documentation](/dev-guide/api-documentation) page for an overview of key packages and classes. You can also generate full Javadoc locally:
+
+    ```bash
+    ./gradlew javadoc
+    ```
+
+    The output is written to `core/build/docs/javadoc/`.
+  </Accordion>
+
+  <Accordion title="How do I run the tests?">
+    See [Testing and debugging](/dev-guide/testing-and-debugging) for full instructions. Quick reference:
+
+    ```bash
+    # All tests
+    ./gradlew test
+
+    # Core module only
+    ./gradlew core:test
+
+    # A specific test class
+    ./gradlew core:test --tests "info.openrocket.core.util.MathUtilTest"
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Build issues
+
+<AccordionGroup>
+  <Accordion title='Gradle fails with "Could not find or load main class"'>
+    Your Java environment is likely misconfigured. OpenRocket requires Java 17.
+
+    ```bash
+    # Check the installed Java version
+    java -version
+
+    # Verify JAVA_HOME points to a Java 17 installation
+    echo $JAVA_HOME
+    ```
+
+    If `java -version` shows a version below 17, install a Java 17 JDK and update your `JAVA_HOME` environment variable.
+  </Accordion>
+
+  <Accordion title="Gradle fails with dependency resolution errors">
+    Clean the Gradle cache and rebuild:
+
+    ```bash
+    ./gradlew clean
+    ./gradlew build
+    ```
+
+    If the issue persists, delete the local Gradle cache at `~/.gradle/caches/` and try again.
+  </Accordion>
+
+  <Accordion title="Build fails because coverage thresholds are not met">
+    The `core` module enforces a minimum of 60% test coverage. If JAR packaging fails with a coverage error, run the coverage report to identify what is missing:
+
+    ```bash
+    ./gradlew test jacocoRootReport
+    ```
+
+    Open `core/build/reports/jacoco/index.html` to see which classes and methods are not covered.
+  </Accordion>
+</AccordionGroup>
+
+## Runtime issues
+
+<AccordionGroup>
+  <Accordion title="The 3D view doesn't work or causes a crash">
+    The 3D view uses JOGL (Java OpenGL), which can fail on some graphics drivers or virtual machines. Disable it at launch:
+
+    ```bash
+    java -Dopenrocket.3d.disable -jar OpenRocket.jar
+    ```
+
+    This bypasses the 3D renderer and falls back to a 2D view.
+  </Accordion>
+
+  <Accordion title='"Application.injector is null" when embedding the core module'>
+    You are calling an OpenRocket API before initializing the core module. Always call `OpenRocketCore.initialize()` before using any other OpenRocket classes:
+
+    ```java
+    OpenRocketCore.initialize();
+    // Now safe to use OpenRocket APIs
+    ```
+  </Accordion>
+
+  <Accordion title="Motor or component database fails to load">
+    The database files must be accessible on the classpath. During development, you can skip database loading to speed up startup:
+
+    ```java
+    System.setProperty("openrocket.bypass.motors", "true");
+    System.setProperty("openrocket.bypass.presets", "true");
+    OpenRocketCore.initialize();
+    ```
+  </Accordion>
+</AccordionGroup>
+
+## Getting help
+
+If the issue is not covered above:
+
+<CardGroup cols={2}>
+  <Card title="GitHub Issues" icon="github" href="https://github.com/openrocket/openrocket/issues">
+    Search existing issues or open a new one.
+  </Card>
+  <Card title="Discord" icon="discord" href="https://discord.gg/qD2G5v2FAw">
+    Chat with the OpenRocket community in real time.
+  </Card>
+  <Card title="Rocketry Forum" icon="comments" href="https://www.rocketryforum.com/forums/rocketry-electronics-software.36/">
+    Post in the electronics and software section of TRF.
+  </Card>
+  <Card title="GitHub Discussions" icon="message" href="https://github.com/openrocket/openrocket/discussions">
+    Start a broader conversation or ask a question.
+  </Card>
+</CardGroup>

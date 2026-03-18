@@ -1,0 +1,152 @@
+---
+title: Development setup
+description: How to set up your local development environment to build and run OpenRocket from source.
+---
+
+This guide walks you through setting up a local development environment to build and run OpenRocket from the source code.
+
+## Prerequisites
+
+Install the following before you begin:
+
+<AccordionGroup>
+  <Accordion title="JDK 17">
+    OpenRocket is developed using Java 17. Download it from the [Oracle JDK 17 archive](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html) or use any compatible distribution such as Amazon Corretto or Eclipse Temurin.
+
+    If you have multiple Java versions installed, verify that Java 17 is active:
+
+    ```bash
+    java -version
+    ```
+  </Accordion>
+  <Accordion title="Git">
+    Git is required to clone the repository and manage branches. Download it from [git-scm.com](https://git-scm.com/downloads).
+  </Accordion>
+  <Accordion title="GitHub account">
+    You need a GitHub account to fork the OpenRocket repository and submit pull requests. Sign up at [github.com](https://github.com).
+  </Accordion>
+  <Accordion title="Gradle">
+    OpenRocket uses Gradle as its build system. A Gradle wrapper (`./gradlew`) is included in the repository, so a separate system-wide Gradle installation is optional. If you want one, follow the instructions at [gradle.org/install](https://gradle.org/install/).
+  </Accordion>
+</AccordionGroup>
+
+## Obtaining the source code
+
+You cannot push directly to the official OpenRocket repository. Instead, fork it to create a personal copy, make your changes there, and then submit a pull request.
+
+<Steps>
+  <Step title="Fork the repository">
+    Go to [github.com/openrocket/openrocket](https://github.com/openrocket/openrocket) and click the **Fork** button in the top-right corner. Leave the default settings and click **Create fork**. This creates a copy of the repository under your GitHub account at `https://github.com/<your_username>/openrocket`.
+  </Step>
+  <Step title="Clone your fork">
+    Clone the fork to your local machine. Replace `[YOUR USERNAME]` with your GitHub username:
+
+    <Tabs>
+      <Tab title="SSH (recommended)">
+        ```bash
+        git clone git@github.com:[YOUR USERNAME]/openrocket.git
+        ```
+      </Tab>
+      <Tab title="HTTPS">
+        ```bash
+        git clone https://github.com/[YOUR USERNAME]/openrocket.git
+        ```
+      </Tab>
+    </Tabs>
+  </Step>
+  <Step title="Initialize submodules">
+    OpenRocket uses Git submodules for the component database. Initialize and fetch them after cloning:
+
+    ```bash
+    git submodule init
+    git submodule update
+    ```
+  </Step>
+</Steps>
+
+### Keeping your fork in sync
+
+The official repository changes frequently. Before starting new work, check whether your fork is behind and sync it if needed. GitHub shows a **Sync fork** button on your fork's page; click it and then choose **Update branch**.
+
+After syncing on GitHub, pull the changes into your local clone:
+
+```bash
+git fetch && git pull
+```
+
+<Warning>
+  Always keep your fork in sync before opening a pull request. A fork that is many commits behind the main repository is more likely to cause merge conflicts.
+</Warning>
+
+## IDE setup: IntelliJ IDEA
+
+IntelliJ IDEA is the recommended IDE for OpenRocket development. The Community Edition is free and available at [jetbrains.com/idea/download](https://www.jetbrains.com/idea/download) (scroll to **IntelliJ IDEA Community Edition**).
+
+<Steps>
+  <Step title="Open the project">
+    Start IntelliJ IDEA. Go to **File → New → Project from Existing Sources**. In the file dialog, navigate to the directory where you cloned OpenRocket, select the `build.gradle` file in the root `openrocket/` directory, and click **Open**.
+  </Step>
+  <Step title="Load as a Gradle project">
+    IntelliJ should detect that this is a Gradle project and display a pop-up asking you to **Load Gradle Project**. Click it.
+
+    If you dismissed the pop-up, open `build.gradle` in the editor, right-click anywhere in the file, and choose **Link Gradle Project**.
+  </Step>
+  <Step title="Configure the JDK">
+    Go to **File → Project Structure → Project**. Set the **Project SDK** to JDK 17.
+
+    If JDK 17 is not listed, click the SDK dropdown and choose **Download JDK**. Select version 17 and any vendor (OpenJDK, Amazon Corretto, etc.).
+
+    Then go to **Project Structure → Modules** and confirm that every module's SDK is set to JDK 17. If any module shows `<No SDK>`, click the **Module SDK** dropdown and select JDK 17.
+  </Step>
+  <Step title="Run OpenRocket">
+    IntelliJ includes three pre-configured run configurations:
+
+    | Configuration | Purpose |
+    |---|---|
+    | `SwingStartup` | Runs the full OpenRocket application. Use this for everyday development. |
+    | `openrocket-jar` | Runs all unit tests and builds the application as a JAR. |
+    | `openrocket-test` | Runs unit tests only. |
+
+    Select **SwingStartup** from the run-configuration dropdown and click the green **Play** button. To debug, click the green **Bug** icon instead.
+  </Step>
+</Steps>
+
+## Building from the command line
+
+You can also build and run OpenRocket without an IDE using the Gradle wrapper included in the repository.
+
+**Run OpenRocket:**
+```bash
+./gradlew run
+```
+
+**Build a distributable JAR:**
+```bash
+./gradlew shadowJar
+```
+The output is placed in `build/libs/OpenRocket-<version>.jar`.
+
+**Run all tests:**
+```bash
+./gradlew test
+```
+
+**Run Checkstyle:**
+```bash
+./gradlew checkstyleMain checkstyleTest
+```
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="JDK not recognized">
+    Ensure that the JDK path is correctly configured under **File → Project Structure → SDKs**. If JDK 17 is missing, download it from within the Project Structure dialog.
+  </Accordion>
+  <Accordion title="Gradle sync fails">
+    - Click the **Reload All Gradle Projects** button in IntelliJ's Gradle tool window.
+    - Confirm that `gradle/wrapper/gradle-wrapper.properties` references a Gradle version compatible with Java 17.
+  </Accordion>
+  <Accordion title="ClassNotFoundException: info.openrocket.swing.startup.SwingStartup">
+    This error usually means the project was not imported as a Gradle project. Open `build.gradle` in IntelliJ, right-click in the file, and choose **Link Gradle Project**. Then re-run the `SwingStartup` configuration.
+  </Accordion>
+</AccordionGroup>

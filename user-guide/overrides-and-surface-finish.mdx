@@ -1,0 +1,183 @@
+---
+title: "Overrides and surface finish"
+description: "Use mass, CG, and drag coefficient overrides together with surface finish settings to produce more accurate OpenRocket simulations."
+---
+
+As you develop a design, OpenRocket estimates stability and performance from component geometry and material data. As you acquire real parts, build the rocket, and collect flight data, you can replace these estimates with measured values. This page explains how to use mass, center of gravity (CG), and coefficient of drag (C_D) overrides, and how surface finish settings affect drag.
+
+---
+
+## Overrides
+
+OpenRocket lets you override three values that directly determine flight characteristics:
+
+<CardGroup cols={3}>
+  <Card title="Mass" icon="scale-balanced">
+    Replace the calculated mass of a component or assembly with a measured value from a scale.
+  </Card>
+  <Card title="Center of gravity" icon="bullseye">
+    Replace the calculated CG position with one measured by balancing the assembled rocket on a knife edge or hanging it from a string.
+  </Card>
+  <Card title="Coefficient of drag (C_D)" icon="wind">
+    Adjust the drag coefficient after comparing a completed simulation to real flight data.
+  </Card>
+</CardGroup>
+
+All three overrides can be applied at three levels:
+
+- **Single component** — the lowest level; overrides only the one component
+- **Subassembly (component group)** — overrides the parent component and optionally its children
+- **Stage** — the highest level; overrides the entire stage
+
+### Override for all subcomponents
+
+OpenRocket's component tree is hierarchical: each component may have child subcomponents. When you apply an override, you can choose whether to apply it to all subcomponents as well.
+
+**Without subcomponent override:** The override value is added to the values calculated for all subcomponents. For example, if a body tube has a calculated mass of 100 g and its fins have a calculated mass of 50 g, overriding the body tube to 110 g results in a total of 160 g.
+
+**With subcomponent override:** The override value replaces the mass of the entire subtree. Overriding the body tube to 170 g with subcomponent override enabled means the total assembly mass is 170 g — the fins contribute no additional mass.
+
+<Tip>
+  Use the subcomponent override when you have weighed a completed subassembly (including glue, paint, and hardware). The override should then represent the total measured mass of that assembly, and subcomponents should be overridden so they are not counted twice.
+</Tip>
+
+---
+
+## Using overrides throughout the build process
+
+### When designing your rocket
+
+During the design phase, OpenRocket calculates estimated mass, CG, and C_D from component geometry and material density. Use these estimates to select a motor and verify that the CG is forward of the CP by a comfortable stability margin before ordering parts.
+
+### When you have your parts
+
+Once you have the physical components, weigh each one individually. Override the mass of each component at the **single component** level with the measured value. Recheck the CG-to-CP margin after applying these overrides.
+
+### As you build your rocket
+
+As subassemblies are completed, weigh each one and measure its CG. Apply mass and CG overrides at the **subassembly** level, checking **Override for all subcomponents** so that the subcomponent masses are not double-counted.
+
+When the rocket is fully assembled, weigh it and measure its CG one final time. Apply these overrides at the **stage** level with **Override for all subcomponents** enabled.
+
+<Note>
+  Apply a stage-level mass and CG override on every rocket you build. This gives the most accurate starting point for simulation before the first flight.
+</Note>
+
+### After your first test flight
+
+After the first flight, compare your simulation results to actual flight data (altitude, velocity profile, and so on from an altimeter or on-board logger). Because mass and CG are already overridden with measured values, the main remaining variable is drag. Adjust drag in two ways:
+
+1. **Change the surface finish** — adjusts friction drag across the airframe without overriding any C_D values.
+2. **Apply a stage-level C_D override** — nudges the overall drag coefficient up or down while preserving the per-component C_D calculations.
+
+---
+
+## Mass and CG override details
+
+### Stability margin and rotational inertia
+
+The recommended stability margin is:
+- **Not less than 1.0 caliber** for subsonic flights
+- **Not less than 2.0 calibers** for transonic and supersonic flights
+
+When you override the mass and CG of subcomponents, the rocket's rotational inertia (moment of inertia) changes. A poorly placed mass override can make a rocket simulate as stable when it is not, or as unstable when it is, particularly near the minimum stability margin.
+
+Beginning with OpenRocket 22.02, you can override a stage's mass or CG **without** overriding subcomponents. This adds the override value as a delta on top of the calculated values, preserving the existing distribution of mass and its contribution to rotational inertia.
+
+### Matching measured mass and CG
+
+The recommended approach to minimize impact on rotational inertia is:
+
+1. Compute the difference between the measured and calculated mass (or CG).
+2. Enter that difference as the override value on the stage or subassembly component.
+3. Leave **Override for all subcomponents** unchecked.
+
+This adds the discrepancy (from glue, paint, decals, and so on) without redistributing the component masses that OpenRocket uses for inertia calculations.
+
+### Adjustable weight systems
+
+You can use the stage-level mass and CG overrides to simulate an adjustable nose weight that compensates for different motor sizes.
+
+<Tabs>
+  <Tab title="Simplified approach">
+    <Steps>
+      <Step title="Add a mass component for ballast">
+        Place a **Mass component** inside the airframe. Position it relative to the **Tip of the nose cone**, entering the measured distance from the nose tip to the rocket's actual CG (flight-ready, without motor).
+      </Step>
+      <Step title="Set the stage CG override">
+        In the **Stage configuration** pane, enter the distance from the nose tip to the center of your adjustable weight as the **Override center of gravity** value.
+      </Step>
+      <Step title="Tune mass for your motor">
+        Select your motor configuration. On the **Stage configuration** pane, adjust the **Override mass** value until the stability margin between CG and CP is comfortable. Then add that exact amount of weight to the physical adjustable weight system in the rocket.
+      </Step>
+    </Steps>
+
+    Before heading to the range, install the motor (without igniter) and verify the stability margin physically — mark the CG in blue and the CP in red on the airframe.
+  </Tab>
+  <Tab title="Precision approach">
+    <Steps>
+      <Step title="Override each component">
+        Weigh every individual part. Enter the measured mass override for each component at the single-component level.
+      </Step>
+      <Step title="Override each subassembly">
+        Using the component tree as a guide, identify each parent component. As each subassembly is completed during construction, weigh it and enter its mass as an override on the parent's **Override** tab, checking **Override mass and CG of all subcomponents**. This accounts for adhesive, fasteners, and other build materials.
+      </Step>
+      <Step title="Apply stage-level overrides">
+        Follow the simplified approach steps to set the stage-level mass and CG overrides and tune for each motor configuration.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+---
+
+## Surface finish settings
+
+Surface finish (roughness) determines how air flows over the airframe. A smoother surface produces less friction drag; a rougher surface produces more. OpenRocket offers five surface finish options, in order from highest drag to lowest:
+
+| Finish | Drag contribution |
+|--------|-------------------|
+| **Rough** | Highest |
+| **Unfinished** | High |
+| **Regular paint** | Medium |
+| **Smooth paint** | Low |
+| **Polished** | Lowest |
+
+Each component has its own surface finish setting, accessible on its **Appearance** tab (under **General** > **Component finish** in the configuration window). You can apply a single finish to every component at once by clicking **Set for all** on any component's **Appearance** tab.
+
+<Note>
+  **Set for all** only applies to components that exist at the time it is used. Components added afterward will use the default finish.
+</Note>
+
+Changing the surface finish adjusts the overall C_D by modifying friction drag across all exterior components, without overriding any individual component's drag coefficient. This preserves OpenRocket's ability to calculate natural C_D variations caused by velocity and atmospheric density changes during flight.
+
+---
+
+## Coefficient of drag (C_D) overrides
+
+### How the stage C_D override works
+
+The stage C_D override behaves the same way as the mass and CG overrides:
+
+- **With subcomponent override enabled**: Your value replaces the aggregate C_D of all components.
+- **Without subcomponent override**: Your value is added to the calculated C_D of all components.
+
+### Recommended workflow
+
+<Steps>
+  <Step title="Bracket with surface finish">
+    After your first flight, change the surface finish setting (applying to all components) to make the simulated flight closer to the actual result. Try the two finish settings that bracket your target and identify which simulation result is lower.
+  </Step>
+  <Step title="Set the closer finish">
+    Set the surface finish to the option from the two bracketing simulations that produced the lower result.
+  </Step>
+  <Step title="Fine-tune with stage C_D override">
+    If additional precision is needed, apply a small C_D offset at the **Stage** level. Leave **Override for all subcomponents** unchecked. Adjust the value incrementally and rerun the simulation until the results match actual flight data.
+  </Step>
+</Steps>
+
+<Warning>
+  Overriding C_D at the component or subassembly level is **not recommended**. The drag coefficient changes with velocity and atmospheric density throughout the flight, especially near the speed of sound. A C_D calibrated from a flight with a small motor may give misleading results when used with a larger motor. Use the stage-level offset approach instead.
+</Warning>
+
+Applying this method at the stage level without overriding subcomponents retains per-component C_D calculations and the simulation's ability to model natural drag variation throughout the flight envelope.

@@ -1,0 +1,78 @@
+---
+title: "Rocket analysis"
+description: "Use the component analysis tool to inspect stability, per-component drag, and roll coefficients for any flight configuration."
+---
+
+The **Component Analysis** tool lets you examine how individual parts of your rocket contribute to stability, drag, and roll — at any combination of Mach number and angle of attack. This is useful for diagnosing stability problems, understanding where drag comes from, and checking roll behavior on finned designs.
+
+## Opening component analysis
+
+To open the tool, go to **Analyze → Component analysis** in the menu bar. The window shows three tabs: **Stability**, **Drag**, and **Roll**.
+
+At the top of the window you can select the **Flight configuration** and set the **Mach number** and **Angle of attack** to analyze. All tables update immediately as you change these values.
+
+## Stability tab
+
+The **Stability** tab shows the contribution of each rocket component to the overall center of pressure (CP) location and to the normal force coefficient (CNα).
+
+| Column | Description |
+|--------|-------------|
+| **Component** | Name of the rocket component |
+| **CP** | Center of pressure location measured from the nose tip |
+| **CNα** | Normal force coefficient derivative — how much normal force this component contributes per radian of angle of attack |
+
+The summary row at the bottom shows the total CP location and CNα for the rocket, as well as the center of gravity (CG) location and the stability margin in calibers.
+
+<Info>
+Stability margin is defined as `(CG − CP) / reference diameter`. A margin of at least 1 caliber is the commonly recommended minimum for a stable flight. A margin above about 2 calibers may cause the rocket to weathercock excessively in wind.
+</Info>
+
+The stability values on this tab reflect the **static** stability of the rocket at the specified Mach number and angle of attack. These are the same values shown in the Rocket Design window's status bar, but broken down per component so you can see which components are driving or reducing stability.
+
+## Drag tab
+
+The **Drag** tab shows the drag coefficient breakdown for each component, at the selected Mach number and angle of attack.
+
+| Column | Description |
+|--------|-------------|
+| **Component** | Name of the rocket component |
+| **Pressure CD** | Pressure (form) drag coefficient |
+| **Base CD** | Base drag coefficient (only applies to components with a flat base exposed to flow) |
+| **Friction CD** | Skin friction drag coefficient |
+| **CD per instance** | Total drag coefficient for one instance of this component |
+| **Total CD** | Total drag coefficient contribution from all instances of this component |
+
+The summary row shows the overall total drag coefficient for the rocket.
+
+Use the drag breakdown to identify which components contribute most to total drag. For example:
+
+- A blunt nose cone will have a large pressure drag contribution
+- Long, thin tubes with rough surface finishes will have elevated friction drag
+- Fins contribute both pressure and friction drag, and their count multiplies the per-instance value
+
+<Tip>
+To reduce drag, focus first on the components with the highest **Total CD** contribution. Small improvements to a high-drag component have more effect than the same change to a low-drag one.
+</Tip>
+
+## Roll tab
+
+The **Roll** tab shows the roll coefficients for each component that contributes to roll moments. This is relevant when fins are canted (swept or angled) intentionally to induce spin, or unintentionally due to manufacturing variation.
+
+| Column | Description |
+|--------|-------------|
+| **Component** | Name of the rocket component |
+| **Roll forcing coefficient (Clf)** | Coefficient representing the aerodynamic force that drives the rocket to spin |
+| **Roll damping coefficient (Cld)** | Coefficient representing the aerodynamic resistance to spinning |
+| **Total roll coefficient** | Net roll coefficient for this component (Clf − Cld) |
+
+The summary row shows the total roll forcing coefficient, total roll damping coefficient, and the net roll coefficient for the whole rocket.
+
+<Warning>
+A positive net total roll coefficient means the rocket will spin up in flight. Very high spin rates can cause roll-coupled instability. If you're adding intentional spin (e.g., for stability in wind), verify that the resulting spin rate is within acceptable limits for your design.
+</Warning>
+
+## How analysis values relate to simulation
+
+The values shown in Component Analysis are computed at a single operating point (one Mach number and angle of attack). During an actual simulation, these values change continuously as the rocket accelerates, decelerates, and changes orientation.
+
+To see how CP location, stability margin, drag coefficients, or roll coefficients evolve over an entire flight, add those variables to a simulation plot. See [Advanced flight simulation](/user-guide/advanced-flight-simulation) for instructions on configuring simulation plots.

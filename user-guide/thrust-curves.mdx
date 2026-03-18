@@ -1,0 +1,128 @@
+---
+title: "Thrust curves"
+description: "Understand motor naming conventions, use OpenRocket's built-in motor database, and import custom thrust curve files in RASP or RockSim format."
+---
+
+Every motor simulation in OpenRocket is driven by a thrust curve — a time-series record of thrust output over the motor's burn. OpenRocket ships with a large built-in database of certified motor thrust curves, and also lets you import your own.
+
+## Motor naming convention
+
+Model and high-power rocket motors follow a standardized naming convention defined by the National Fire Protection Association (NFPA 1125). Understanding the designation helps you quickly gauge what a motor can do.
+
+A typical designation looks like: **D12-5**
+
+| Part | Example | Meaning |
+|------|---------|--------|
+| **Impulse class letter** | `D` | Total impulse range. Each letter doubles the previous: A = 1.26–2.5 Ns, B = 2.51–5 Ns, C = 5.01–10 Ns, D = 10.01–20 Ns, and so on up through O and beyond. |
+| **Average thrust (N)** | `12` | Average thrust in Newtons over the burn time. |
+| **Ejection delay (s)** | `5` | Delay in seconds from burnout to ejection charge firing. A `0` means no delay; a `P` means plugged (no ejection charge). |
+
+For reload motors, the designation often separates the casing from the propellant grain. For example, an AeroTech **J800T-P** is a J-class motor with 800 N average thrust, using a Blue Thunder (`T`) propellant, with a plugged delay (`P`).
+
+<Info>
+The burn time is defined by NFPA 1125 as the duration during which the motor produces more than 5% of its maximum thrust. This is the threshold used internally by OpenRocket when calculating average thrust and burn time.
+</Info>
+
+## The built-in motor database
+
+OpenRocket includes a comprehensive built-in database of certified motor thrust curves, sourced from manufacturers and certification bodies. The database covers motors from:
+
+- **Single-use** solid propellant motors (e.g., Estes, Quest)
+- **Reloadable** solid propellant motors (e.g., AeroTech RMS, Cesaroni Pro)
+- **Hybrid** motors
+
+The database is accessible from the **Motor Selection** panel in the **Motors & Configuration** tab. You can filter it by manufacturer, impulse class, and motor dimensions, or search by designation. See [Basic flight simulation](/user-guide/basic-flight-simulation) for details on using the Motor Selection panel.
+
+## Importing custom thrust curves
+
+OpenRocket supports importing motor thrust curves from two file formats:
+
+<CardGroup cols={2}>
+  <Card title="RASP (.eng)" icon="file-code">
+    The RASP format is a plain-text format used by many certification databases and motor simulation tools. Files use the `.eng` extension.
+  </Card>
+  <Card title="RockSim (.rse)" icon="file-code">
+    The RockSim format is an XML-based format used by the RockSim simulation software. Files use the `.rse` extension.
+  </Card>
+</CardGroup>
+
+Both formats are widely available from motor manufacturers' websites, the [ThrustCurve.org](https://www.thrustcurve.org) database, and other rocketry resources.
+
+### Configuring the thrust curves folder
+
+OpenRocket scans one or more folders on your disk for custom thrust curve files at startup. To configure which folders are scanned:
+
+<Steps>
+  <Step title="Open Preferences">
+    Go to **Edit → Preferences** (Windows/Linux) or **OpenRocket → Preferences** (macOS).
+  </Step>
+  <Step title="Go to the Thrust curves tab">
+    Click the **Thrust curves** tab in the Preferences window.
+  </Step>
+  <Step title="Add or remove folders">
+    Use the **Add** button to add a directory containing your `.eng` or `.rse` files. Use **Remove** to remove a directory from the scan list. You can add multiple directories.
+  </Step>
+  <Step title="Restart or reload">
+    After making changes, restart OpenRocket (or use the reload option if available) for the new files to appear in the Motor Selection panel.
+  </Step>
+</Steps>
+
+<Note>
+Custom thrust curve files are merged with the built-in database. If a custom file defines a motor with the same designation as a built-in motor, both entries will appear in the Motor Selection panel — you can choose which thrust curve to use.
+</Note>
+
+### RASP (.eng) file format
+
+The RASP format is a simple line-based text format. A typical `.eng` file looks like this:
+
+```text
+; Custom motor example
+; Name Diam(mm) Len(mm) Delays Prop-mass(g) Total-mass(g) Manufacturer
+D12 24 70 0,3,5,7 12.0 25.8 Estes
+0.000 0.0
+0.015 12.5
+0.060 14.4
+0.100 13.5
+0.150 12.8
+0.900 0.5
+0.950 0.0
+;
+```
+
+- Lines starting with `;` are comments
+- The header line provides the motor designation, dimensions, available delays, propellant mass, total mass, and manufacturer
+- Each subsequent data line gives a time (seconds) and thrust (Newtons) pair
+- A trailing `;` ends the motor definition; multiple motors can appear in one file
+
+### RockSim (.rse) file format
+
+The RockSim format is XML-based. Each motor entry is an `<engine>` element with attributes for the motor's physical parameters and nested `<data-point>` elements for the thrust curve:
+
+```xml
+<engine-database>
+  <engine-list>
+    <engine mfr="Example" code="D12" len="70" dia="24"
+            initWt="25.8" propWt="12.0" delays="0,3,5,7"
+            avgThrust="12" peakThrust="19.5" throatDia="0"
+            exitDia="0" Itot="8.82" burnTime="0.95" massFrac="0.465"
+            Type="single-use">
+      <comments>Example motor</comments>
+      <data>
+        <eng-data t="0.000" f="0.0"/>
+        <eng-data t="0.015" f="12.5"/>
+        <eng-data t="0.100" f="13.5"/>
+        <eng-data t="0.950" f="0.0"/>
+      </data>
+    </engine>
+  </engine-list>
+</engine-database>
+```
+
+## Viewing a motor's thrust curve
+
+To see the thrust curve for any motor in the Motor Selection panel, select the motor in the list and check the **Show Details** section at the bottom of the panel. This displays:
+
+- A graph of thrust (N) versus time (s)
+- Average thrust, peak thrust, and burn time
+- Total impulse
+- Certification information (if available)

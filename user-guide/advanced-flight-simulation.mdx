@@ -1,0 +1,234 @@
+---
+title: "Advanced flight simulation"
+description: "Plot flight data, configure wind and launch conditions, use aerodynamic lookup tables, and export simulation results to CSV."
+---
+
+Once you've run a basic simulation, OpenRocket gives you a full suite of tools for deeper analysis: multi-parameter plots, wind and atmospheric modeling, custom aerodynamic data from CSV lookup tables, and flexible CSV export.
+
+## Plotting your rocket's flight
+
+To open the plotting and export interface, select a simulation in the **Flight Simulations** window and click the **Plot / Export** button.
+
+This opens the **Edit simulation** panel, which contains two tabs: **Plot data** and **Export data**.
+
+### Choosing what to plot
+
+The **Plot data** tab lets you fully configure the chart. Start with one of the built-in standard plot configurations from the drop-down at the top of the panel — these cover the most common combinations such as altitude and velocity, or stability margin over time.
+
+If you need something more specific, configure the axes manually:
+
+- **X axis** — typically **Time**, though any single variable can be used
+- **Y axes** — add as many variables as you need using **New Y-axis plot type**; assign each to the left or right axis scale using its drop-down
+- Remove a Y-axis variable with its **X** button
+
+#### Available variable categories
+
+Over 50 variables are available, organized into the following groups:
+
+<AccordionGroup>
+  <Accordion title="Time">
+    Variables related to simulation time.
+  </Accordion>
+  <Accordion title="Position and motion">
+    Altitude, altitude above sea level, vertical velocity, total velocity, vertical acceleration, total acceleration, lateral position (East and North of launch), lateral distance, lateral direction, lateral velocity, lateral acceleration, latitude, and longitude.
+  </Accordion>
+  <Accordion title="Orientation">
+    Angle of attack, roll rate, pitch rate, yaw rate, vertical orientation (zenith), and lateral orientation (azimuth).
+  </Accordion>
+  <Accordion title="Mass and inertia">
+    Total mass, motor mass, longitudinal moment of inertia, rotational moment of inertia, and gravity.
+  </Accordion>
+  <Accordion title="Stability">
+    CP location, CG location, stability margin (in calibers), damping ratio, and natural frequency.
+  </Accordion>
+  <Accordion title="Thrust and drag">
+    Thrust force, thrust-to-weight ratio, drag force, drag coefficient (Cd), friction drag coefficient, pressure drag coefficient, base drag coefficient, and axial drag coefficient.
+  </Accordion>
+  <Accordion title="Coefficients">
+    Normal force coefficient, CNα, pitch moment coefficient, yaw moment coefficient, side force coefficient, roll moment coefficient, roll forcing coefficient, roll damping coefficient, pitch damping coefficient, yaw damping coefficient, and damping moment coefficient.
+  </Accordion>
+  <Accordion title="Atmospheric conditions">
+    Air pressure, air temperature, air density, speed of sound, wind velocity (East and North components), and total wind velocity.
+  </Accordion>
+  <Accordion title="Characteristic numbers">
+    Mach number and Reynolds number.
+  </Accordion>
+  <Accordion title="Reference values">
+    Reference area and reference length.
+  </Accordion>
+  <Accordion title="Simulation information">
+    Simulation time step.
+  </Accordion>
+  <Accordion title="Custom">
+    User-defined expressions created in the **Custom Expressions** tool. See [Custom expressions](/user-guide/custom-expressions).
+  </Accordion>
+</AccordionGroup>
+
+To find a variable quickly, click the variable drop-down and type in the search box. You can also scroll through the category groups.
+
+### Marking flight events on the plot
+
+Below the Y-axis configuration, you can select any combination of flight events to be called out as vertical markers on the chart. Available events include:
+
+- **Motor ignition**
+- **Motor burnout**
+- **Apogee**
+- **Recovery device deployment** (drogue and/or main)
+- **Ground hit**
+
+For complex rockets with airstarts or dual-deploy, multiple events appear on the same chart — such as separate airstart ignitions, drogue deployment, and main deployment.
+
+### Reading the plot
+
+The chart renders after you click **Plot**. Lines for each Y-axis variable appear in different colors. Flight event markers appear as vertical lines with labels.
+
+<Info>
+For rockets with airstart motors, look at the velocity curve before and after the airstart event. If the rocket is already losing velocity when the upper stage ignites, the airstart may be too late — try an earlier airstart delay in a new simulation.
+</Info>
+
+## Launch conditions and simulation options
+
+Before plotting, click the **&lt;&lt; Edit** button in the plot window to return to the simulation configuration. This gives access to the **Launch conditions** and **Simulation options** tabs.
+
+### Launch conditions
+
+The **Launch conditions** tab sets the physical environment for the simulation.
+
+<CardGroup cols={2}>
+  <Card title="Wind" icon="wind">
+    Set average wind speed, standard deviation (gustiness), and direction. Wind affects both the rocket's trajectory and its lateral drift downrange.
+  </Card>
+  <Card title="Launch site" icon="map-pin">
+    Set the latitude, longitude, and altitude of the launch site. Altitude affects air density and speed of sound.
+  </Card>
+  <Card title="Atmospheric conditions" icon="cloud">
+    Set local temperature and barometric pressure. These affect air density, which in turn affects ascent velocity and the local speed of sound.
+  </Card>
+  <Card title="Launch rod or rail" icon="arrow-up">
+    Set the length of your launch rod or rail. This determines whether the simulation passes or fails the minimum speed check — the rocket must reach a stable velocity before leaving the rod.
+  </Card>
+</CardGroup>
+
+### Simulation options
+
+The **Simulation options** tab controls lower-level aspects of how the simulation runs:
+
+- **Earth geometry** — choose between a spherical or WGS84 ellipsoid Earth model. This does not affect the background in Photo Studio, only the physics.
+- **Time step** — set the time resolution of the simulation. Smaller steps increase accuracy but take longer to compute.
+- **Simulation extensions** — add, configure, or remove extensions that modify simulation behavior. See [Simulation extensions](/user-guide/simulation-extensions) for details.
+
+## Aerodynamic lookup tables
+
+By default, OpenRocket calculates aerodynamic forces using the Extended Barrowman method based on your rocket's geometry. You can override these calculations with custom data — for example, from wind tunnel tests or CFD simulations — by providing CSV lookup tables.
+
+To configure lookup tables, edit a simulation, go to **Simulation options**, and click **Configure...** in the **Aerodynamic data** section.
+
+<Warning>
+When lookup tables are active, they completely replace the Barrowman calculations for drag and/or stability. You cannot mix lookup table data with Barrowman calculations. Individual component forces are set to zero; only total forces from the table are used.
+</Warning>
+
+### Drag lookup tables
+
+Drag lookup tables specify the drag coefficient (Cd) as a function of Mach number and, optionally, angle of attack (AoA).
+
+Required columns:
+
+| Column | Required | Description |
+|--------|----------|-------------|
+| `Mach` | Yes | Mach number |
+| `AoA` | No | Angle of attack in degrees |
+| `Cd` | Yes | Drag coefficient |
+
+<Tabs>
+  <Tab title="With AoA">
+    ```text
+    Mach,AoA,Cd
+    0.0,0,0.25
+    0.0,5,0.30
+    0.0,10,0.35
+    0.5,0,0.30
+    0.5,5,0.36
+    0.5,10,0.42
+    1.0,0,0.35
+    1.0,5,0.40
+    1.0,10,0.45
+    ```
+  </Tab>
+  <Tab title="Mach only">
+    ```text
+    Mach,Cd
+    0.0,0.25
+    0.5,0.30
+    1.0,0.35
+    ```
+  </Tab>
+</Tabs>
+
+### Stability lookup tables
+
+Stability lookup tables specify stability coefficients as a function of Mach number and, optionally, angle of attack.
+
+Required columns:
+
+| Column | Required | Description |
+|--------|----------|-------------|
+| `Mach` | Yes | Mach number |
+| `AoA` | No | Angle of attack in degrees |
+| `Cn` | Yes | Normal force coefficient |
+| `Cm` | Yes | Pitching moment coefficient |
+| `Cp` | Yes | Center of pressure position (meters from nose) |
+
+```text
+Mach,AoA,Cn,Cm,Cp
+0.0,0,0.10,0.01,0.50
+0.0,5,0.15,0.02,0.52
+0.5,0,0.12,0.015,0.51
+0.5,5,0.18,0.025,0.53
+1.0,0,0.15,0.02,0.52
+1.0,5,0.22,0.03,0.54
+```
+
+### CSV file format rules
+
+- The first non-empty, non-comment line must be the header row with column names
+- Column names are case-insensitive; spaces and underscores are ignored (`Angle of Attack` and `AoA` both work)
+- Lines starting with `#` are treated as comments and ignored during parsing
+- Default separator is comma (`,`); semicolon, tab, and space are also supported
+- Values are linearly interpolated between table points in both Mach and AoA dimensions
+- Values outside the table range are clamped to the nearest edge value
+
+### Editing table data in OpenRocket
+
+Once you load a CSV file, you can edit the data directly in the configuration dialog. Changes are embedded into the `.ork` file — your rocket design is self-contained and portable. Use the **Refresh** button (↻) next to **Load from file...** to reload the original CSV if it still exists on disk.
+
+### When to use lookup tables
+
+Lookup tables are most useful when:
+
+- You have wind tunnel test data for your specific rocket design
+- You have CFD simulation results to validate against Barrowman calculations
+- Your rocket has complex aerodynamic behavior not well-captured by the Barrowman method
+- You need angle-of-attack dependent coefficients beyond what Barrowman provides
+
+## Exporting simulation data
+
+The **Export data** tab (in the same **Plot / Export** panel) sets up a CSV export of your simulation results.
+
+<Steps>
+  <Step title="Select variables to export">
+    Check any combination of the 50+ available variables. The list matches the variables available for plotting, plus **Coriolis acceleration**.
+  </Step>
+  <Step title="Configure optional comments">
+    Enable **Comments** to prepend a header block listing flight events (such as apogee time), simulation description, and column descriptions to the CSV file.
+  </Step>
+  <Step title="Choose a separator">
+    Select comma (default), semicolon, space, or TAB as the field separator to match your target analysis tool.
+  </Step>
+  <Step title="Click Export">
+    Click the **Export** button and choose a filename and directory in the file dialog.
+  </Step>
+</Steps>
+
+<Tip>
+Exported CSV files can be opened directly in Excel, LibreOffice Calc, MATLAB, Python/pandas, or any other data analysis tool for further post-processing and charting.
+</Tip>

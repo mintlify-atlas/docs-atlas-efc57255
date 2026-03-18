@@ -1,0 +1,218 @@
+---
+title: Preferences
+description: How to customize OpenRocket using the Preferences dialog — language, theme, units, simulation defaults, launch conditions, materials, and graphics settings.
+---
+
+The Preferences dialog lets you customize how OpenRocket looks and behaves. Changes to most settings take effect immediately or the next time you open a relevant window.
+
+## Accessing the preferences dialog
+
+Open the Preferences dialog using any of these methods:
+
+- **Edit** > **Preferences**
+- **Windows/Linux:** `Ctrl` + `,`
+- **macOS:** `Cmd` + `,`
+
+---
+
+## General
+
+The **General** tab contains application-wide settings.
+
+**Interface language**
+
+Select the language for the OpenRocket interface. Available languages include English, Czech, German, Spanish, French, Italian, Dutch, Polish, Portuguese, Turkish, Russian, Ukrainian, Arabic, Chinese, and Japanese. The `System default` option uses the language set in your operating system.
+
+<Note>
+  You must restart OpenRocket for a language change to take effect.
+</Note>
+
+<Warning>
+  Many translations are incomplete or out of date. Missing strings are displayed in English. If you find errors or missing translations, please [open an issue on GitHub](https://github.com/openrocket/openrocket/issues) or contribute via Crowdin.
+</Warning>
+
+**UI theme**
+
+Select the visual theme for the interface:
+
+- `Auto (detect)` — follows your operating system's theme
+- `Light (default)` — the original OpenRocket light theme
+- `Dark` — a dark theme
+- `Dark, high-contrast` — a dark theme with increased contrast
+
+<Note>
+  You must restart OpenRocket for a theme change to take effect.
+</Note>
+
+**UI font size**
+
+Adjust the interface font size. The default is 13. A restart is required for this change to take effect.
+
+**User-defined thrust curves**
+
+Specify one or more directories containing your own thrust curve files. OpenRocket scans these directories at startup in addition to its built-in ThrustCurve.org database. Separate multiple paths with a semicolon (`;`).
+
+- **Add** — select a directory to add
+- **Reset** — restore the default directory
+
+**Update checks**
+
+- **Always check for software updates at startup** — notifies you when a new release is available
+- **Check now** — manually check for updates immediately
+- **Also check for pre-releases** — includes release candidates and beta versions in update checks
+
+**Other general settings**
+
+- **Open last design file on startup** — reopens the most recent project when OpenRocket starts
+- **Show warning when saving in RASAero format** — alerts you when exporting to a format that may lose some information
+- **Show warning when saving in RockSim format** — same as above for RockSim format
+- **Show confirmation dialog when discarding preferences** — prompts for confirmation before discarding unsaved preference changes
+
+---
+
+## Design
+
+The **Design** tab controls how the rocket design view behaves.
+
+- **Position to insert new body components** — choose whether OpenRocket always asks, inserts in the middle, or adds to the end
+- **Position to insert new stages** — same behavior for stages
+- **Size of text in rocket design panel** — controls label text size in the design view
+- **Default Mach number for C.P. estimate** — the Mach value used for center of pressure calculations in the design view
+- **Always open leftmost tab when opening a component edit dialog** — if disabled, the last-used tab reopens instead
+- **Show confirmation dialog for discarding component changes** — prompts before cancelling unsaved component edits
+- **Show confirmation dialog for discarding simulation changes** — prompts before cancelling unsaved simulation edits
+- **Update estimated flight parameters in design window** — recalculates and displays estimated flight parameters in the design view as you edit
+- **Only show pod set/booster markers when selected** — hides pod/booster instance markers unless the pod set or booster is selected in the tree
+
+---
+
+## Simulation
+
+The **Simulation** tab controls simulation behavior and defaults.
+
+- **Confirm deletion of simulations** — prompts before deleting a simulation
+- **Run out-dated simulations when you open the simulation tab** — automatically re-runs simulations that are out of date when you switch to the Flight Simulations tab
+- **Geodetic calculations** — choose the coordinate calculation method used for Earth coordinates
+- **Time step** — the minimum time step for simulations; smaller values produce more accurate results but take longer to compute
+
+<Note>
+  OpenRocket uses optimized (adaptive) time steps. The actual time step varies throughout the simulation and may be larger than the configured minimum where precision is less critical.
+</Note>
+
+- **Reset to default** — restores all simulation options to their defaults
+
+---
+
+## Launch
+
+The **Launch** tab sets default launch conditions for new simulations.
+
+<Warning>
+  Settings in the Launch tab have no effect on simulations that already exist in your design. Only new simulations created after changing these settings will use the updated values.
+</Warning>
+
+<Tabs>
+  <Tab title="Wind">
+    - **Average windspeed** — average wind speed relative to the ground
+    - **Standard deviation** — measure of wind speed dispersion; the actual wind speed is within twice this value 95% of the time
+    - **Turbulence intensity** — standard deviation divided by average wind speed; typical values are 5%–20%
+    - **Wind direction** — direction the wind is coming from (0° = north, 90° = east, 180° = south, 270° = west)
+  </Tab>
+  <Tab title="Atmospheric conditions">
+    - **Use International Standard Atmosphere** — if enabled, uses the ISA model (15 °C, 1013.25 mbar at sea level); if disabled, set temperature and pressure manually
+    - **Temperature** — temperature at the launch site
+    - **Pressure** — pressure at the launch site
+  </Tab>
+  <Tab title="Launch site">
+    - **Latitude** — latitude coordinate of the launch site
+    - **Longitude** — longitude coordinate of the launch site
+    - **Altitude** — altitude of the launch site above sea level
+  </Tab>
+  <Tab title="Launch rod">
+    - **Length** — length of the launch rod
+    - **Always launch directly up-wind or down-wind** — if enabled, the rod always points into or away from the wind
+    - **Angle** — angle of the launch rod relative to vertical (0° = straight up)
+    - **Direction** — direction of the launch rod relative to the wind (0° = into the wind, 90° = east of the wind)
+  </Tab>
+</Tabs>
+
+---
+
+## Units
+
+The **Units** tab sets the measurement units used throughout the application.
+
+You can configure units individually for:
+
+- Rocket dimensions, motor dimensions, distance, velocity, acceleration, mass, force, total impulse, moment of inertia
+- Stability (primary and secondary) — options include `mm`, `cm`, `m`, `in`, `cal` (calibers), and `%` of rocket length
+- Line density, surface density, bulk density, surface roughness, area, angle, roll rate, temperature, pressure, wind speed, latitude, longitude
+
+Use **Default metric** or **Default imperial** to set all units at once.
+
+---
+
+## Materials
+
+The **Materials** tab lists all materials available in OpenRocket, including pre-installed materials and any custom materials you have added.
+
+- Pre-installed materials are shown in greyed-out text and cannot be deleted.
+- **New** — add a custom material
+- **Edit** — edit a material; editing a pre-installed material creates a new custom material with the same name rather than modifying the original
+- **Delete** — delete a custom material
+- **Revert all** — delete all user-defined materials
+
+<Note>
+  Editing materials does not affect existing rocket designs. Only designs created or modified after the change will use the updated material properties.
+</Note>
+
+---
+
+## Graphics
+
+The **Graphics** tab controls 3D rendering and texture editing settings.
+
+**Graphics editor**
+
+Select the external application used to edit textures when you click **Edit** next to the texture field in a component's **Appearance** tab:
+
+- **Show Prompt** — asks each time
+- **Use Default Editor** — uses the OS default for the file type
+- **Command Line** — specify the executable path and arguments for a particular editor
+
+**3D graphics**
+
+- **Enable 3D Graphics** — if disabled, all 3D features are unavailable
+- **Enable Anti-aliasing** — smooths edges in 3D views
+- **Use Off-screen Rendering** — renders 3D graphics off-screen; improves performance on some systems but may cause issues on others
+
+<Tip>
+  If you experience issues with the 3D view (such as the rocket appearing too small or rendering incorrectly), try toggling **Use Off-screen Rendering**.
+</Tip>
+
+<Note>
+  Graphics changes take effect the next time you open a 3D window.
+</Note>
+
+---
+
+## Importing and exporting preferences
+
+You can export your preferences to an XML file and import them on another machine. This is useful for sharing a consistent configuration across multiple computers or when helping others set up OpenRocket.
+
+**Export preferences**
+
+Click **Export preferences** at the bottom of the **General** tab. A file dialog opens where you choose the save location. Two options are available:
+
+- **Export user directories** — includes user-defined directory paths (e.g. thrust curve folders); disable this if the target machine uses different paths
+- **Export window information (position, size...)** — includes cached window positions and sizes; disable this for a clean layout on the target machine
+
+**Import preferences**
+
+Click **Import preferences** at the bottom of the **General** tab and select the XML file to import.
+
+---
+
+## Resetting preferences
+
+To reset all preferences to their factory defaults, click **Reset all preferences** at the bottom of the **General** tab.

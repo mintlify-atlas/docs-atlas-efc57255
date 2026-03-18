@@ -1,0 +1,152 @@
+---
+title: 'API documentation'
+description: 'Overview of the key public packages and classes in the OpenRocket core API.'
+---
+
+The OpenRocket core module exposes a public Java API that you can use to integrate simulation functionality into your own applications. This page describes the most important packages and classes.
+
+<Note>
+  Full Javadoc can be generated from the source by running `./gradlew javadoc`. The output is written to `core/build/docs/javadoc/`.
+</Note>
+
+## Key packages
+
+<CardGroup cols={2}>
+  <Card title="info.openrocket.core.startup" icon="play">
+    Bootstrap and dependency injection. Start here when embedding the core module.
+  </Card>
+  <Card title="info.openrocket.core.rocketcomponent" icon="rocket">
+    All rocket component classes — NoseCone, BodyTube, FinSet, Motor, and more.
+  </Card>
+  <Card title="info.openrocket.core.simulation" icon="chart-line">
+    Simulation engine, options, and result data.
+  </Card>
+  <Card title="info.openrocket.core.document" icon="file">
+    `OpenRocketDocument` and document factory — the top-level container for a rocket design.
+  </Card>
+  <Card title="info.openrocket.core.file" icon="folder-open">
+    File loaders and savers (`GeneralRocketLoader`, `GeneralRocketSaver`).
+  </Card>
+  <Card title="info.openrocket.core.l10n" icon="language">
+    Internationalization — `Translator` and related classes.
+  </Card>
+  <Card title="info.openrocket.core.database" icon="database">
+    Motor and component preset databases.
+  </Card>
+  <Card title="info.openrocket.core.preferences" icon="sliders">
+    `ApplicationPreferences` — user and application settings.
+  </Card>
+</CardGroup>
+
+## Startup and initialization
+
+| Class | Description |
+|---|---|
+| `OpenRocketCore` | Static helper to initialize the core module with one call. |
+| `Application` | Provides static accessors for core singletons (translator, preferences, motor database). |
+| `CoreModule` | Guice module that wires all core services together. |
+| `PluginModule` | Guice module for plugin support. Pass to `OpenRocketCore.initialize()`. |
+
+See [Using OpenRocket core](/dev-guide/using-openrocket-core) for full initialization examples.
+
+## Rocket component model
+
+All rocket components live in `info.openrocket.core.rocketcomponent`. The component tree is rooted at `Rocket`, which contains one or more `AxialStage` objects.
+
+| Class | Description |
+|---|---|
+| `Rocket` | Top-level rocket object. Contains stages. |
+| `AxialStage` | A stage (sustainer, booster, etc.). Contains components. |
+| `NoseCone` | Nose cone component with configurable shape (ogive, conical, parabolic, etc.). |
+| `BodyTube` | Cylindrical body tube. |
+| `Transition` | Transition (shoulder or boat tail) between two diameters. |
+| `TrapezoidFinSet` | Trapezoidal fin set. |
+| `EllipticalFinSet` | Elliptical fin set. |
+| `FreeformFinSet` | Freeform fin set defined by arbitrary points. |
+| `InnerTube` | Inner tube, used as a motor mount or structural element. |
+| `LaunchLug` | Launch lug. |
+| `RailButton` | Rail button for launch rails. |
+| `Parachute` | Parachute recovery device. |
+| `Streamer` | Streamer recovery device. |
+| `MassComponent` | Non-structural mass object (e.g. electronics bay, payload). |
+| `ShockCord` | Shock cord connecting airframe sections. |
+
+### Component hierarchy
+
+Components are connected in a parent–child tree. Call `parent.addChild(child)` to attach a component. Each component class defines which child types it accepts.
+
+```java
+Rocket rocket = new Rocket();
+AxialStage stage = new AxialStage();
+rocket.addChild(stage);
+
+BodyTube bodyTube = new BodyTube();
+stage.addChild(bodyTube);
+
+TrapezoidFinSet fins = new TrapezoidFinSet();
+bodyTube.addChild(fins);
+```
+
+## Document API
+
+| Class | Description |
+|---|---|
+| `OpenRocketDocument` | Container for a complete rocket design, simulations, and metadata. |
+| `OpenRocketDocumentFactory` | Factory for creating new blank documents. |
+
+```java
+OpenRocketDocument document = OpenRocketDocumentFactory.createNewRocket();
+Rocket rocket = document.getRocket();
+```
+
+## File I/O
+
+| Class | Description |
+|---|---|
+| `GeneralRocketLoader` | Detects file format and loads `.ork` or `.rkt` files into an `OpenRocketDocument`. |
+| `GeneralRocketSaver` | Saves an `OpenRocketDocument` to disk. |
+
+## Simulation API
+
+| Class | Description |
+|---|---|
+| `Simulation` | Represents a single simulation run bound to a `Rocket`. |
+| `SimulationOptions` | Configuration for a simulation: launch angle, wind, altitude, motor selections, etc. |
+| `SimulationStatus` | Runtime state during simulation. |
+| `FlightDataType` | Enum of all measurable flight data types (altitude, velocity, acceleration, etc.). |
+| `FlightData` | Result data from a completed simulation. |
+| `FlightDataBranch` | A single data series (e.g. main flight path or ejected stage). |
+
+## Database API
+
+| Class | Description |
+|---|---|
+| `ThrustCurveMotorSetDatabase` | Database of all known motors loaded from the bundled SQLite file. |
+| `ComponentPresetDao` | Data access object for component presets (commercial tubes, nose cones, etc.). |
+
+Access the motor database through `Application`:
+
+```java
+ThrustCurveMotorSetDatabase motorDb = Application.getMotorSetDatabase();
+```
+
+## Internationalization
+
+| Class | Description |
+|---|---|
+| `Translator` | Interface for retrieving translated strings by key. |
+| `ClassBasedTranslator` | Automatically infers a translation key prefix from the calling class. |
+| `ExceptionSuppressingTranslator` | Wraps another translator and suppresses missing-key exceptions. |
+
+```java
+private static final Translator trans = Application.getTranslator();
+String label = trans.get("RocketPanel.lbl.Stability");
+```
+
+## Preferences
+
+`ApplicationPreferences` exposes user settings such as units, default simulation parameters, and UI preferences. Access it through `Application`:
+
+```java
+ApplicationPreferences prefs = Application.getPreferences();
+```

@@ -1,0 +1,166 @@
+---
+title: Installation
+description: How to download and install OpenRocket on Windows, macOS, and Linux.
+---
+
+OpenRocket is released in two forms: as a **packaged application** and as a **JAR file**. The easiest way to get OpenRocket up and running is to download and install one of the packaged installers. Packaged installers include the correct version of Java — you do not need to install, update, or downgrade Java on your device to run them.
+
+Download the latest version from the [OpenRocket downloads page](https://openrocket.info/downloads.html?vers=latest).
+
+---
+
+## Pre-installation procedures
+
+<Warning>
+  Some users experience problems with OpenRocket installation if they skip these steps. Read them before installing.
+</Warning>
+
+### Close all instances of OpenRocket
+
+If OpenRocket is currently running, close it before installing a new version. New OpenRocket releases install to the same location and share preferences with earlier releases. If OpenRocket is open when you install an update, the installation may not update all files correctly.
+
+**You must close all open instances of OpenRocket before installing an update.**
+
+### Uninstall prior releases (optional)
+
+Although not strictly required, it is recommended to uninstall any previously installed releases before installing an updated release. This ensures the proper function of OpenRocket.
+
+---
+
+## Installing OpenRocket
+
+<Tabs>
+  <Tab title="Windows">
+    <Steps>
+      <Step title="Download the installer">
+        Go to the [OpenRocket downloads page](https://openrocket.info/downloads.html?vers=latest) and download the Windows installer (`.exe` file).
+      </Step>
+      <Step title="Run the installer">
+        Double-click the downloaded `.exe` file. If Windows shows a security prompt (SmartScreen), click **More info** then **Run anyway** to proceed.
+      </Step>
+      <Step title="Follow the setup wizard">
+        Accept the license agreement and follow the on-screen prompts. The installer will place OpenRocket in the default program directory and create Start Menu and Desktop shortcuts.
+      </Step>
+      <Step title="Launch OpenRocket">
+        Open OpenRocket from the Start Menu or Desktop shortcut. The splash screen will appear briefly during startup.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="macOS">
+    <Steps>
+      <Step title="Download the disk image">
+        Go to the [OpenRocket downloads page](https://openrocket.info/downloads.html?vers=latest) and download the macOS disk image (`.dmg` file).
+      </Step>
+      <Step title="Open the disk image">
+        Double-click the downloaded `.dmg` file to mount it.
+      </Step>
+      <Step title="Drag to Applications">
+        Drag the OpenRocket application icon into your **Applications** folder.
+      </Step>
+      <Step title="Open OpenRocket">
+        Open OpenRocket from your **Applications** folder. On the first launch, macOS may display a Gatekeeper prompt. Right-click (or Control-click) the app and select **Open**, then confirm in the dialog.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Linux">
+    <Steps>
+      <Step title="Download the package">
+        Go to the [OpenRocket downloads page](https://openrocket.info/downloads.html?vers=latest) and download the Linux package. OpenRocket is available as a `.deb` package, an `.AppImage`, and via the Snap Store.
+      </Step>
+      <Step title="Install the package">
+        **Debian/Ubuntu (.deb):**
+        ```bash
+        sudo dpkg -i openrocket-*.deb
+        ```
+
+        **AppImage:**
+        ```bash
+        chmod +x OpenRocket-*.AppImage
+        ./OpenRocket-*.AppImage
+        ```
+
+        **Snap:**
+        ```bash
+        sudo snap install openrocket
+        ```
+      </Step>
+      <Step title="Launch OpenRocket">
+        Launch OpenRocket from your application menu or by running `openrocket` in a terminal.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+---
+
+## Post-installation checks
+
+After installing OpenRocket, verify the installation and adjust any settings that may need changing.
+
+### Verify the installed release number
+
+Check that you installed the correct release. The release number appears on the splash screen during startup, on the right side of the splash image.
+
+You can also verify the release number at any time by opening **Help** > **About**. This opens a dialog showing the exact release number.
+
+### Check the settings
+
+For most users the default settings work fine. However, some settings may need adjustment.
+
+**Off-screen rendering**
+
+Some users report that the rocket in the 3D design view appears too small. This is caused by an incorrect off-screen rendering setting.
+
+To fix it:
+1. Open **Edit** > **Preferences**.
+2. Click the **Graphics** tab.
+3. Toggle the **Use off-screen rendering** setting.
+
+<Note>
+  Whenever you experience issues with 3D rendering in OpenRocket, toggling the off-screen rendering setting is a good first step.
+</Note>
+
+**Thrust curves folder**
+
+OpenRocket ships with built-in motor thrust curves, but you can also add your own. For custom thrust curves to be loaded, you need to specify the folder where they are stored.
+
+The default thrust curves folder varies by operating system:
+
+| Operating system | Default thrust curves directory |
+|---|---|
+| Windows | `%APPDATA%\OpenRocket\ThrustCurves` |
+| macOS | `/Users/[YOUR USERNAME]/Library/Application Support/OpenRocket/ThrustCurves/` |
+| Linux | `/home/[YOUR USERNAME]/.openrocket/ThrustCurves/` |
+
+To view or change the thrust curves folder:
+1. Open **Edit** > **Preferences**.
+2. Go to the **General** tab.
+3. Edit the **User-defined thrust curves** field.
+
+You can add multiple folders by separating paths with a semicolon (`;`).
+
+---
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The installer is blocked by Windows SmartScreen">
+    OpenRocket installers are not code-signed with a paid certificate, which can trigger Windows SmartScreen. To proceed, click **More info** in the SmartScreen prompt and then click **Run anyway**. Only do this with files downloaded directly from the official [OpenRocket downloads page](https://openrocket.info/downloads.html?vers=latest).
+  </Accordion>
+
+  <Accordion title="macOS says the app is from an unidentified developer">
+    Right-click (or Control-click) the OpenRocket app in your Applications folder and select **Open**. A dialog will appear with an option to open the app anyway. You only need to do this the first time you launch the application.
+  </Accordion>
+
+  <Accordion title="The 3D view shows the rocket too small">
+    This is an off-screen rendering issue. Open **Edit** > **Preferences**, go to the **Graphics** tab, and toggle the **Use off-screen rendering** setting. Restart OpenRocket and check whether the problem is resolved.
+  </Accordion>
+
+  <Accordion title="OpenRocket will not start after updating">
+    Make sure you closed all running instances of OpenRocket before installing. If the problem persists, try uninstalling the previous version fully and then reinstalling. See the installation instructions for your platform on the [downloads page](https://openrocket.info/downloads.html?vers=latest).
+  </Accordion>
+
+  <Accordion title="I still have an issue not listed here">
+    Check the platform-specific installation instructions by visiting the [OpenRocket downloads page](https://openrocket.info/downloads.html?vers=latest) and expanding the instructions under your platform's download button. For further help, [contact the OpenRocket team](https://openrocket.info/contact.html).
+  </Accordion>
+</AccordionGroup>

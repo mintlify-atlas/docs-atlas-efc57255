@@ -1,97 +1,87 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: OpenRocket Documentation
+description: Design, visualize, and simulate model rockets before you build and fly them.
 ---
 
-## Setting up
+<div style={{background: "linear-gradient(135deg, #ba4519 0%, #8a3010 100%)", borderRadius: "12px", padding: "48px 40px", marginBottom: "32px", color: "white"}}>
+  <div style={{maxWidth: "680px"}}>
+    <h1 style={{fontSize: "2.75rem", fontWeight: "700", margin: "0 0 16px 0", color: "white", lineHeight: "1.15"}}>OpenRocket</h1>
+    <p style={{fontSize: "1.2rem", margin: "0 0 28px 0", opacity: "0.9", lineHeight: "1.6"}}>
+      The free, open-source model rocket simulator. Design rockets, run six-degree-of-freedom flight simulations, and optimize your designs — all before your first build.
+    </p>
+    <div style={{display: "flex", gap: "12px", flexWrap: "wrap"}}>
+      <a href="/setup/installation" style={{background: "white", color: "#ba4519", padding: "10px 24px", borderRadius: "4px", fontWeight: "600", textDecoration: "none", fontSize: "0.95rem"}}>Download OpenRocket</a>
+      <a href="/introduction/overview" style={{background: "rgba(255,255,255,0.15)", color: "white", padding: "10px 24px", borderRadius: "4px", fontWeight: "600", textDecoration: "none", fontSize: "0.95rem", border: "1px solid rgba(255,255,255,0.4)"}}>Learn More</a>
+    </div>
+  </div>
+</div>
 
-Get your documentation site up and running in minutes.
+## Get started
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+<CardGroup cols={3}>
+  <Card title="Installation" icon="download" href="/setup/installation">
+    Download and install OpenRocket on Windows, macOS, or Linux. Packaged installers include the correct Java runtime.
   </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Getting Started" icon="rocket" href="/setup/getting-started">
+    Open example designs, explore the interface, and run your first simulation in minutes.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Basic Rocket Design" icon="drafting-compass" href="/user-guide/basic-rocket-design">
+    Learn how to assemble nose cones, body tubes, fin sets, and more using the component editor.
   </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+## Core features
 
-Everything you need to create world-class documentation.
+<CardGroup cols={2}>
+  <Card title="6DOF Flight Simulation" icon="chart-line" href="/user-guide/basic-flight-simulation">
+    Full six-degree-of-freedom simulation using Runge-Kutta 4 integration. Compute apogee, velocity, acceleration, and more.
+  </Card>
+  <Card title="Rocket Design Editor" icon="pencil-ruler" href="/user-guide/basic-rocket-design">
+    Build rockets from a rich set of components — nose cones, body tubes, fins, transitions, inner tubes, and mass objects.
+  </Card>
+  <Card title="Automatic Optimization" icon="sliders" href="/user-guide/advanced-flight-simulation">
+    Optimize any rocket parameter for maximum altitude, velocity, or stability using the built-in optimizer.
+  </Card>
+  <Card title="Stability Analysis" icon="scale-balanced" href="/user-guide/rocket-analysis">
+    Real-time CG and CP display using the extended Barrowman method. Per-component drag and roll analysis.
+  </Card>
+  <Card title="Thrust Curves and Motors" icon="fire-flame-curved" href="/user-guide/thrust-curves">
+    Access thousands of certified motors from ThrustCurve.org. Import custom RASP, RockSim, and RATT files.
+  </Card>
+  <Card title="Simulation Extensions" icon="plug" href="/user-guide/simulation-extensions">
+    Extend simulations with custom Java listeners, compute user-defined expressions, and integrate external code.
+  </Card>
+</CardGroup>
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
+## For developers
 
-## Need inspiration?
+<CardGroup cols={2}>
+  <Card title="Architecture Overview" icon="sitemap" href="/dev-guide/architecture">
+    Understand OpenRocket's two-module structure: the headless `core` library and the Swing-based `swing` GUI.
+  </Card>
+  <Card title="Using OpenRocket Core" icon="code" href="/dev-guide/using-openrocket-core">
+    Embed the simulation engine in your own Java application. Load designs, run simulations, and access results programmatically.
+  </Card>
+  <Card title="Development Setup" icon="wrench" href="/dev-guide/development-setup">
+    Set up your development environment, build with Gradle, and run OpenRocket from source.
+  </Card>
+  <Card title="Contributing" icon="code-pull-request" href="/dev-guide/development-guidelines">
+    Guidelines for submitting pull requests, writing tests, and maintaining code quality standards.
+  </Card>
+</CardGroup>
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+## About OpenRocket
+
+OpenRocket was originally created by Sampo Niskanen in 2009 as part of his master's thesis at Helsinki University of Technology (now Aalto University). It is written entirely in Java, making it fully cross-platform, and is released under the **GNU GPL v3** license.
+
+<CardGroup cols={3}>
+  <Card title="Features" icon="star" href="/introduction/features">
+    Full feature list and comparison with RockSim.
+  </Card>
+  <Card title="FAQ" icon="circle-question" href="/introduction/faq">
+    Answers to common questions about installation, simulation, and design.
+  </Card>
+  <Card title="Contribute" icon="heart" href="/introduction/contribute">
+    Help improve OpenRocket by contributing code, documentation, or translations.
+  </Card>
+</CardGroup>

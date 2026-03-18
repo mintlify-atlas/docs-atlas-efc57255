@@ -1,0 +1,45 @@
+---
+title: Development overview
+description: An introduction to the OpenRocket codebase for developers who want to contribute or extend the project.
+---
+
+Welcome to the OpenRocket developer guide. This documentation covers the architecture, codebase, and development workflows for developers interested in contributing to OpenRocket or embedding it in another application.
+
+For technical details about aerodynamic calculations and simulation methods, see the [OpenRocket technical documentation](https://openrocket.info/documentation.html).
+
+## Code structure
+
+OpenRocket is a Java application organized using the **Java Platform Module System (JPMS)** and built with [Gradle](https://gradle.org/). The codebase is split into two modules:
+
+<CardGroup cols={2}>
+  <Card title="info.openrocket.core" icon="microchip" href="/dev-guide/codebase-walkthrough">
+    The backend library. Contains the rocket component model, simulation engine, file format parsers and writers, and aerodynamic calculators. Has no dependency on any GUI toolkit — it can be embedded in other applications.
+  </Card>
+  <Card title="info.openrocket.swing" icon="window" href="/dev-guide/codebase-walkthrough">
+    The graphical user interface. Built with the Java Swing toolkit. Depends on `info.openrocket.core` and uses it to run simulations and display results.
+  </Card>
+</CardGroup>
+
+## Developer guide sections
+
+<CardGroup cols={2}>
+  <Card title="Development setup" icon="wrench" href="/dev-guide/development-setup">
+    Prerequisites, forking and cloning the repository, IntelliJ IDEA setup, and building from source.
+  </Card>
+  <Card title="Architecture" icon="sitemap" href="/dev-guide/architecture">
+    High-level code architecture: JPMS modules, dependency injection with Guice, and key subsystems.
+  </Card>
+  <Card title="Codebase walkthrough" icon="folder-tree" href="/dev-guide/codebase-walkthrough">
+    A package-by-package guide to the most important directories in `core` and `swing`.
+  </Card>
+  <Card title="File specification" icon="file-code" href="/dev-guide/file-specification">
+    The `.ork` rocket design file format and the `.orc` component preset file format.
+  </Card>
+  <Card title="Development guidelines" icon="list-check" href="/dev-guide/development-guidelines">
+    Coding standards, commit etiquette, pull request process, and Checkstyle enforcement.
+  </Card>
+</CardGroup>
+
+<Note>
+  Contributions are welcome from everyone. Whether you are fixing a bug, adding a feature, improving documentation, or translating the UI, the maintainers appreciate any help.
+</Note>

@@ -1,0 +1,206 @@
+---
+title: 'Contributing to the docs'
+description: 'How to edit, build, and style OpenRocket documentation using Sphinx and reStructuredText.'
+---
+
+The OpenRocket documentation is written in [reStructuredText](https://docutils.sourceforge.io/rst.html), built with [Sphinx](https://www.sphinx-doc.org/), and hosted on [Read the Docs](https://readthedocs.org/). Source files live alongside the code in the repository under `docs/source/`.
+
+## Setting up the documentation build
+
+<Steps>
+  <Step title="Install dependencies">
+    Open a terminal in the `docs/` directory and install the required Python packages:
+
+    ```bash
+    pip install -r requirements.txt
+    ```
+  </Step>
+  <Step title="Build the docs">
+    From the `docs/` directory, run:
+
+    ```bash
+    make html
+    ```
+
+    This generates the documentation in `docs/build/html/`. Open `index.html` in your browser to preview it.
+  </Step>
+  <Step title="Clean the build">
+    If you change the theme or the build configuration, clean the previous output first:
+
+    ```bash
+    make clean
+    ```
+  </Step>
+</Steps>
+
+## Submitting changes
+
+Edit the `.rst` files in `docs/source/`, then submit a pull request with your changes. If you are not comfortable with Git, [open an issue](https://github.com/openrocket/openrocket/issues/new/choose) with your proposed changes or [contact us](https://openrocket.info/contact.html) and we will handle it.
+
+## Style guide
+
+### Heading levels
+
+ReStructuredText does not assign fixed decoration characters to heading levels — the hierarchy is determined by the order in which decorations first appear. OpenRocket docs use the following convention:
+
+| Level | Decoration | Usage |
+|---|---|---|
+| H1 | `*` with overline | Chapter (page title) |
+| H2 | `=` | Section |
+| H3 | `-` | Subsection |
+| H4 | `^` | Subsubsection |
+| H5 | `"` | Paragraph |
+
+```rst
+*****************************************
+H1: This is a chapter (title of the page)
+*****************************************
+
+H2: This is a section
+=====================
+
+H3: This is a subsection
+------------------------
+
+H4: This is a subsubsection
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+H5: This is a paragraph
+"""""""""""""""""""""""
+```
+
+The overline and underline must be the same length as the heading text.
+
+### Horizontal rules
+
+Insert a horizontal rule before starting each new H2 section using four or more hyphens:
+
+```rst
+This is a section
+=================
+
+----
+
+This is another section
+=======================
+```
+
+### Adding images
+
+Images go in `docs/source/img/`, following the same directory structure as the source file. Use percentage widths and always include alt text:
+
+```rst
+.. figure:: /img/path/to/your/image.png
+   :width: 60%
+   :align: center
+   :alt: Descriptive alt text
+   :figclass: or-image-border
+
+   Caption for the image.
+```
+
+### Hyperlinks
+
+```rst
+`link text <https://example.com>`__
+```
+
+<Warning>
+  Always use a **double underscore** at the end (`__`). A single underscore can cause build errors when multiple links share the same display text.
+</Warning>
+
+To link to another page within the docs:
+
+```rst
+:doc:`link text </path/to/page>`
+```
+
+To link to a specific section:
+
+```rst
+:ref:`link text <anchor-name>`
+```
+
+Create an anchor with:
+
+```rst
+.. _anchor-name:
+
+This is the anchored section.
+```
+
+### Admonitions
+
+Use admonitions to call out important information:
+
+<Tabs>
+  <Tab title="Tip">
+    ```rst
+    .. tip::
+
+       This is a tip.
+    ```
+  </Tab>
+  <Tab title="Note">
+    ```rst
+    .. note::
+
+       This is a note.
+    ```
+  </Tab>
+  <Tab title="Warning">
+    ```rst
+    .. warning::
+
+       This is a warning.
+    ```
+  </Tab>
+  <Tab title="Attention">
+    ```rst
+    .. attention::
+
+       This is an attention notice.
+    ```
+  </Tab>
+</Tabs>
+
+Other available types: `danger`, `error`, `hint`, `important`, `caution`.
+
+### Semantic markup roles
+
+Sphinx roles apply semantic meaning to inline text:
+
+| Role | Example | Use for |
+|---|---|---|
+| `:menuselection:` | `:menuselection:`File --> Open`` | Menu navigation paths |
+| `:command:` | `:command:`ls`` | CLI commands |
+| `:file:` | `:file:`conf.py`` | File names and paths |
+| `:kbd:` | `:kbd:`Ctrl` + :kbd:`C`` | Keyboard keys |
+| `:guilabel:` | `:guilabel:`Submit`` | UI labels and buttons |
+| `:abbr:` | `:abbr:`OR (OpenRocket)`` | Abbreviations with tooltips |
+
+### Substitutions
+
+Custom substitutions are defined in `docs/source/conf.py` under `rst_prolog`. Use them to avoid repeating version numbers or other frequently updated values:
+
+```rst
+OpenRocket requires Java |java_vers|.
+```
+
+### Line wrapping
+
+Keep lines in `.rst` files under approximately 120 characters. Normal prose can be broken across lines freely — Sphinx treats adjacent lines as a single paragraph as long as there is no blank line between them.
+
+For list items that span multiple lines, indent continuation lines to align with the start of the list item text.
+
+### Todo notes
+
+Mark incomplete sections with a `todo` directive:
+
+```rst
+.. todo::
+
+   This section is not yet finished.
+```
+
+Enable `todo_include_todos = True` in `conf.py` to render all pending todos in the output.

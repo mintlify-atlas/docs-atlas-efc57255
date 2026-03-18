@@ -1,0 +1,71 @@
+---
+title: Frequently asked questions
+description: Answers to common questions about OpenRocket.
+---
+
+<AccordionGroup>
+  <Accordion title="What is OpenRocket?">
+    OpenRocket is a free, open-source model rocket simulator written in Java. It allows you to design model rockets and simulate their flights before actually building and flying them. It computes aerodynamic properties using the extended Barrowman method and integrates equations of motion using a Runge-Kutta 4 simulator.
+  </Accordion>
+
+  <Accordion title="Is OpenRocket free to use?">
+    Yes. OpenRocket is completely free and open source, released under the GNU General Public License v3 (GPLv3). You can download it, use it, study the source code, and even modify it. The source code is available on [GitHub](https://github.com/openrocket/openrocket).
+  </Accordion>
+
+  <Accordion title="Which operating systems does OpenRocket support?">
+    OpenRocket is fully cross-platform. It runs on Windows, macOS, and Linux. Because it is written in Java, the packaged installers include everything you need — you do not need to install, update, or downgrade Java separately.
+  </Accordion>
+
+  <Accordion title="Where can I download OpenRocket?">
+    The latest release is available on the [OpenRocket downloads page](https://openrocket.info/downloads.html?vers=latest). Download the installer for your platform (Windows, macOS, or Linux) and follow the installation instructions for your platform.
+  </Accordion>
+
+  <Accordion title="What file formats does OpenRocket support?">
+    OpenRocket's native file format is `.ork`. It can also open RockSim `.rkt` files and RASAero `.CDX1` files. You can export your designs to RockSim (`.rkt`) and RASAero II (`.CDX1`) formats, as well as export components to OBJ files for 3D printing.
+  </Accordion>
+
+  <Accordion title="How accurate are OpenRocket's simulations?">
+    OpenRocket uses the extended Barrowman method to compute rocket stability and aerodynamics, and a full six-degree-of-freedom Runge-Kutta 4 integrator for flight simulation. The simulation methods are fully documented in the [technical documentation](http://openrocket.info/documentation.html). Accuracy for subsonic flights is generally very good. Transonic and supersonic simulations are less accurate and improved support is planned for a future release.
+  </Accordion>
+
+  <Accordion title="My 3D view shows the rocket too small. How do I fix this?">
+    This is caused by an incorrect off-screen rendering setting. To fix it:
+
+    1. Open **Edit** > **Preferences**.
+    2. Go to the **Graphics** tab.
+    3. Toggle the **Use off-screen rendering** setting.
+
+    Whenever you experience issues with 3D rendering, toggling this setting is a good first troubleshooting step.
+  </Accordion>
+
+  <Accordion title="How do I add custom motor thrust curves?">
+    OpenRocket ships with a large library of built-in motor thrust curves from the ThrustCurve.org database. To add your own:
+
+    1. Open **Edit** > **Preferences**.
+    2. Go to the **General** tab.
+    3. Set the **User-defined thrust curves** field to the folder containing your thrust curve files.
+
+    The default thrust curves folder depends on your operating system:
+    - **Windows:** `%APPDATA%\OpenRocket\ThrustCurves`
+    - **macOS:** `/Users/[YOUR USERNAME]/Library/Application Support/OpenRocket/ThrustCurves/`
+    - **Linux:** `/home/[YOUR USERNAME]/.openrocket/ThrustCurves/`
+  </Accordion>
+
+  <Accordion title="Can I extend OpenRocket with my own code?">
+    Yes. OpenRocket supports custom simulation listeners, custom expressions, and plugins. Simulation listeners allow you to write Java code that interacts with the rocket during a flight simulation. You can also write simulation extensions in JavaScript using the scripting support.
+  </Accordion>
+
+  <Accordion title="How do I check which version of OpenRocket I have installed?">
+    The version number is shown on the splash screen when OpenRocket starts. You can also check it at any time by opening **Help** > **About**.
+  </Accordion>
+
+  <Accordion title="How do I contribute to OpenRocket?">
+    There are many ways to contribute — implementing features, writing documentation, translating the interface, testing pre-releases, or creating example rocket designs. See the [Contribute](/introduction/contribute) page and the [OpenRocket website](https://openrocket.info/contribute.html) for details on how to get involved.
+  </Accordion>
+
+  <Accordion title="Where can I get help or report a bug?">
+    - For bugs and feature requests, use the [GitHub issue tracker](https://github.com/openrocket/openrocket/issues).
+    - For questions and community discussion, join the [OpenRocket Discord server](https://discord.gg/qD2G5v2FAw).
+    - For general contact, see the [OpenRocket contact page](https://openrocket.info/contact.html).
+  </Accordion>
+</AccordionGroup>

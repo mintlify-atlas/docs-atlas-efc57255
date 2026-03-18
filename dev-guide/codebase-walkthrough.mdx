@@ -1,0 +1,211 @@
+---
+title: Codebase walkthrough
+description: A package-by-package guide to the most important directories in the OpenRocket core and swing modules.
+---
+
+This page walks through the most important packages in the `info.openrocket.core` and `info.openrocket.swing` modules. Use it to orient yourself when exploring the codebase.
+
+## Module folder structure
+
+Both modules follow the standard Gradle source layout:
+
+```
+<module>/
+├── gradle/                  # Gradle wrapper
+├── libs/                    # Local JAR files not available in Maven repositories
+├── resources-src/           # Source files for resources (e.g. Inkscape source for splash screen)
+├── scripts/                 # Utility scripts
+├── src/
+│   ├── main/
+│   │   ├── java/            # Java source code
+│   │   └── resources/       # Resource files (images, config, data files)
+│   └── test/
+│       ├── java/            # Java test source code
+│       └── resources/       # Test resource files
+└── src-extra/               # Extra source not part of the main application (e.g. plugin templates)
+```
+
+## Core module
+
+The `core` module source lives at `core/src/main/java/info/openrocket/core/`. The following table describes the main packages:
+
+<AccordionGroup>
+  <Accordion title="aerodynamics — aerodynamic force and coefficient calculations">
+    Calculates aerodynamic properties such as drag coefficient (CD), center of pressure (CP), and aerodynamic forces acting on the rocket during flight.
+
+    - `aerodynamics/barrowman/` — Implementation of the extended Barrowman method for calculating CP and aerodynamic coefficients for each component type.
+  </Accordion>
+  <Accordion title="appearance — component visual appearance">
+    Handles the visual appearance of rocket components in the 3D view, including paint color, transparency, shine, and texture decals.
+
+    - `appearance/defaults/` — Default appearance settings applied when no custom appearance is configured.
+  </Accordion>
+  <Accordion title="communication — external communication">
+    Communicates with external services, for example checking GitHub for the latest OpenRocket release version.
+  </Accordion>
+  <Accordion title="database — component and motor databases">
+    Manages the component preset database and the motor thrust curve database.
+
+    - `database/motor/` — Motor (thrust curve) database loading and lookup.
+  </Accordion>
+  <Accordion title="document — OpenRocket document model">
+    Represents an open OpenRocket document, which contains the rocket design plus all simulations. Handles change notifications and undo/redo state.
+
+    - `document/attachments/` — File attachments embedded in a document.
+    - `document/events/` — Events fired when a document or simulation changes.
+  </Accordion>
+  <Accordion title="file — file format parsers and writers">
+    Contains all file I/O code. Each supported format has its own sub-package.
+
+    | Sub-package | Format |
+    |---|---|
+    | `file/openrocket/importt/` | Read `.ork` files |
+    | `file/openrocket/savers/` | Write `.ork` files |
+    | `file/rasaero/importt/` | Import RASAero II files |
+    | `file/rasaero/export/` | Export to RASAero II |
+    | `file/rocksim/importt/` | Import RockSim files |
+    | `file/rocksim/export/` | Export to RockSim |
+    | `file/motor/` | Motor file handling |
+    | `file/svg/export/` | SVG export |
+    | `file/wavefrontobj/export/` | Wavefront OBJ 3D export |
+    | `file/simplesax/` | SAX XML utility |
+    | `file/iterator/` | Iterate files in directories or ZIP archives |
+  </Accordion>
+  <Accordion title="l10n — localization">
+    Provides translation support for the OpenRocket user interface. Translations are stored as `.properties` files in the `swing` module's resources.
+  </Accordion>
+  <Accordion title="logging — errors, warnings, and diagnostics">
+    OpenRocket's internal diagnostic logging layer, separate from the SLF4J application logging. Records errors, warnings, and simulation aborts for display to users.
+  </Accordion>
+  <Accordion title="masscalc — mass and inertia calculations">
+    Mass property calculation drivers: total mass, center of gravity (CG), and moments of inertia. The actual per-component mass calculations live in the component classes themselves.
+  </Accordion>
+  <Accordion title="material — material physical properties">
+    Defines the material property model (density, type) used throughout the component editor and aerodynamic calculations.
+  </Accordion>
+  <Accordion title="models — physical environment models">
+    Pluggable models for the physical environment during simulation.
+
+    - `models/atmosphere/` — Atmosphere models (e.g., International Standard Atmosphere).
+    - `models/gravity/` — Gravity models.
+    - `models/wind/` — Wind models, including average wind and multi-level wind profiles.
+  </Accordion>
+  <Accordion title="motor — motor configuration and thrust curves">
+    Motor identity, configuration, and thrust curve data structures. Separate from the database lookup code in `database/motor/`.
+  </Accordion>
+  <Accordion title="optimization — trajectory optimization engine">
+    Optimization algorithms and rocket-specific optimization framework.
+
+    - `optimization/general/multidim/` — Multidimensional parallel search.
+    - `optimization/general/onedim/` — One-dimensional golden-section search.
+    - `optimization/rocketoptimization/` — Rocket parameter optimization for specified goals (max altitude, max velocity, etc.).
+  </Accordion>
+  <Accordion title="preset — component preset database">
+    Defines the `ComponentPreset` model and handles loading/saving of `.orc` component database files.
+
+    - `preset/loader/` — Loads component database files.
+    - `preset/xml/` — JAXB-based XML serialization of component presets.
+  </Accordion>
+  <Accordion title="rocketcomponent — rocket component model">
+    The heart of the core module. Contains the class hierarchy for every type of rocket component: `NoseCone`, `BodyTube`, `TrapezoidFinSet`, `Parachute`, and so on. All components extend `RocketComponent`.
+
+    - `rocketcomponent/position/` — Component positioning logic (axial offset, radial offset).
+  </Accordion>
+  <Accordion title="simulation — flight simulation engine">
+    The simulation engine that computes the rocket's flight trajectory.
+
+    - `simulation/customexpression/` — User-defined custom simulation output expressions.
+    - `simulation/extension/` — Simulation extension API and example extensions.
+    - `simulation/listeners/` — Listener interface that hooks into the simulation at each time step.
+    - `simulation/listeners/system/` — Built-in listeners used internally by OpenRocket.
+  </Accordion>
+  <Accordion title="thrustcurve — ThrustCurve.org API and serialization">
+    Fetches motor data from ThrustCurve.org and serializes it into the SQLite database bundled with OpenRocket. The `serializeEngines` Gradle task runs the serialization.
+  </Accordion>
+  <Accordion title="unit — unit definitions and conversions">
+    Defines `Unit` (a single unit with SI conversion methods) and `UnitGroup` (a measurable quantity with multiple available units). All display-facing value formatting goes through this package.
+  </Accordion>
+  <Accordion title="util / utils — utility methods">
+    Miscellaneous utility classes. `util/enums/` provides enum-to-name conversion helpers.
+  </Accordion>
+</AccordionGroup>
+
+## Swing module
+
+The `swing` module source lives at `swing/src/main/java/info/openrocket/swing/`. The following table describes the main packages:
+
+<AccordionGroup>
+  <Accordion title="gui/main — main application window">
+    The top-level application window, toolbar, and main panel.
+
+    - `gui/main/componenttree/` — The rocket component tree panel shown on the left side of the main window.
+    - `gui/main/flightconfigpanel/` — The flight configuration panel for managing motor configurations.
+  </Accordion>
+  <Accordion title="gui/configdialog — component configuration dialogs">
+    The configuration dialogs that open when you double-click a rocket component. Each dialog presents the editable properties for a component type.
+  </Accordion>
+  <Accordion title="gui/rocketfigure — 2D rocket cross-section rendering">
+    Renders the 2D side-view and cross-section figures of the rocket. Each component type provides a `RocketComponentShapeService` implementation that knows how to draw itself.
+  </Accordion>
+  <Accordion title="gui/figure3d — 3D rocket visualization">
+    OpenGL-based 3D rendering of the rocket using JOGL.
+
+    - `gui/figure3d/photo/` — PhotoStudio mode with exhaust, smoke, sparks, and sky rendering.
+  </Accordion>
+  <Accordion title="gui/plot — simulation results plots">
+    JFreeChart-based plots of simulation output data (altitude, velocity, acceleration, etc.).
+  </Accordion>
+  <Accordion title="gui/dialogs — various dialogs">
+    Contains the many dialog windows in OpenRocket:
+
+    - `gui/dialogs/motor/thrustcurve/` — Motor selection and thrust curve browser.
+    - `gui/dialogs/optimization/` — Rocket optimization dialog.
+    - `gui/dialogs/preferences/` — Application preferences dialog.
+    - `gui/dialogs/preset/` — Component preset selection dialog.
+    - `gui/dialogs/flightconfiguration/` — Flight configuration management.
+  </Accordion>
+  <Accordion title="gui/theme — UI theming">
+    FlatLaf-based theming support. Theme property files live in `swing/src/main/resources/themes/` (e.g. `FlatLafLight.properties`, `FlatDarculaLaf.properties`). Custom keys are prefixed with `OR.` and read via `UIManager` in `UITheme.java`.
+  </Accordion>
+  <Accordion title="gui/components — reusable Swing components">
+    Reusable custom Swing widgets used throughout the application, including a compass rose component.
+  </Accordion>
+  <Accordion title="gui/adaptors — model adaptors">
+    Bridges between the core data model and Swing model interfaces (e.g., `TableModel`, `SpinnerModel`). Keeps GUI code decoupled from the domain model.
+  </Accordion>
+  <Accordion title="startup — application entry point and Guice wiring">
+    Contains `SwingStartup`, the main entry point for the desktop application. Sets up the Guice injector and launches the main window.
+
+    - `startup/providers/` — Guice provider classes.
+    - `startup/jij/` — JAR-in-JAR class loading support.
+  </Accordion>
+  <Accordion title="simulation/extension — Swing-side simulation extensions">
+    The Swing UI side of the simulation extension system. Provides the configuration panels for built-in simulation extensions.
+  </Accordion>
+</AccordionGroup>
+
+## UI theming notes
+
+OpenRocket uses FlatLaf property files for UI colors and other defaults. To add or modify a theme value:
+
+1. Edit the relevant `OR.*` key in each theme file under `swing/src/main/resources/themes/`. Keep all variants (light, Darcula, One Dark) in sync.
+2. Add a corresponding lookup in `UITheme.Keys` in `swing/src/main/java/info/openrocket/swing/gui/theme/UITheme.java`.
+3. Test by switching themes in **Preferences** — properties are applied when `UITheme.applyTheme` runs.
+
+## Input validation
+
+For immediate visual feedback on invalid inputs, use `FlatLafOutlines` rather than ad-hoc `putClientProperty` calls:
+
+```java
+// Simple outline
+FlatLafOutlines.setOutline(myComponent, FlatLafOutlines.Outline.WARNING);
+
+// Live validation with conditions
+FlatLafOutlines.validator(mySpinner)
+    .warnIf(() -> suspiciousValue(), () -> trans.get("my.warning.key"))
+    .errorIf(() -> invalidValue(), () -> trans.get("my.error.key"))
+    .showMessagePopup(2500)
+    .listenTo(model1, model2);
+```
+
+Use `warnIf` for "dubious but allowed" values and `errorIf` for values that should block confirmation.

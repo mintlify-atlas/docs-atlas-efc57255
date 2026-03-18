@@ -1,0 +1,166 @@
+---
+title: "Basic flight simulation"
+description: "Run your first OpenRocket flight simulation, select a motor, review results, and export data to CSV."
+---
+
+Simulations are the core of what OpenRocket is built for. In a few clicks you can predict how high a rocket will fly, verify its stability off the launch rod, and dial in the right ejection delay — before you ever buy a motor.
+
+## Why simulate?
+
+Simulations are most valuable once you move beyond Estes A–C motors. As soon as you start choosing from the hundreds of mid- and high-power motors available, you need a way to answer two questions before every flight:
+
+- **What altitude will this motor reach?** You may need to stay below a waiver ceiling, avoid cloud cover, or keep the rocket in visual range.
+- **What ejection delay should I use?** Too short and the parachute opens while the rocket is still screaming upward — tearing a slot (a "zipper") through the airframe. Too long and the rocket free-falls past apogee before deployment, risking a hard ground hit or structural damage.
+
+OpenRocket answers both questions, and much more, in seconds.
+
+## The Flight Simulations window
+
+Open the **Flight Simulations** tab from the main window. The table lists every simulation in your rocket document. Each row shows:
+
+- **Name** — the simulation name
+- **Configuration** — the motor configuration used (usually named for the motor)
+- Calculated result columns: **Max. altitude**, **Max. velocity**, **Max. acceleration**, **Time to apogee**, **Flight time**, **Ground hit velocity**, **Optimum delay**
+
+Result columns are blank until you run the simulation. A green circle with a check mark means the simulation ran successfully. A yellow exclamation mark means the simulation ran but produced at least one warning.
+
+<Warning>
+Simulation 3 in the *A Simple Model Rocket* example shows an exclamation mark because the motor delay is too short — the chute would deploy while the rocket is still moving fast, likely causing a zipper. Always check warnings before flying.
+</Warning>
+
+Common conditions that flag a simulation as failed or warned:
+
+- **Too slow off launch rod** — the rocket may be unstable at launch
+- **Too short a delay** — early parachute deployment, zipper or separation likely
+- **Too long a delay** — late parachute deployment, hard ground hit likely
+- **Ground hit velocity too high** — risk of damage or injury
+
+## Running a simulation
+
+<Steps>
+  <Step title="Select one or more simulations">
+    Click a simulation row to select it. Hold **Shift** or **Ctrl/Cmd** to select multiple rows.
+  </Step>
+  <Step title="Click Run simulations">
+    Click the **Run simulations** button. OpenRocket calculates the flight and fills in all result columns. You can run a single simulation, a selection, or all of them at once.
+  </Step>
+  <Step title="Review the results">
+    Check the result columns. Pay special attention to **Optimum delay** — this is the delay (in seconds) at which the ejection charge would fire at exactly apogee. Compare it to the delay printed on the motor you plan to use.
+  </Step>
+</Steps>
+
+## Motors and configuration
+
+Each simulation is tied to a **motor configuration** — a named set of motors assigned to your rocket's motor mount tubes. To simulate a new motor, you need a new configuration.
+
+### Creating a configuration
+
+<Steps>
+  <Step title="Open the Motors & Configuration tab">
+    Click the **Motors & Configuration** tab in the rocket design window.
+  </Step>
+  <Step title="Create a new configuration">
+    Click **New Configuration**. The configuration appears in the list. Use **Rename Configuration**, **Copy Configuration**, or **Remove Configuration** to manage your configurations.
+  </Step>
+  <Step title="Select a motor">
+    In the **Motor mounts** table, click **Select motor** for the motor mount you want to populate. This opens the **Motor Selection** panel.
+  </Step>
+</Steps>
+
+### Motor Selection panel
+
+The Motor Selection panel lists every motor in OpenRocket's built-in database. Use the filters to narrow the list:
+
+<AccordionGroup>
+  <Accordion title="Manufacturer filter">
+    Restricts the list to motors from specific manufacturers. This is especially useful for reloadable motors: if you own an AeroTech RMS casing, only AeroTech reloads will fit it.
+  </Accordion>
+  <Accordion title="Total Impulse filter">
+    Limits results to a range of impulse classes. No reason to display J–O motors when designing a small model rocket.
+  </Accordion>
+  <Accordion title="Motor Dimensions filter">
+    Filters by diameter and length. A motor larger than your motor mount tube cannot be used, though motors smaller than the maximum diameter are common — use an adapter to get the correct fit.
+  </Accordion>
+  <Accordion title="Hide motors already used in the mount">
+    Prevents you from creating duplicate configurations for the same motor.
+  </Accordion>
+  <Accordion title="Search box">
+    Free-text search against the current filtered list. Type a designation like `C6` or a manufacturer name to jump straight to what you need.
+  </Accordion>
+</AccordionGroup>
+
+The columns in the motor list are sortable. Click any column header to sort by that field.
+
+The **Show Details** section at the bottom of the panel displays the selected motor's thrust curve graph, average thrust, total impulse, burn time, and certification information.
+
+### Setting the ejection charge delay
+
+The **Ejection charge delay** field on the Motor Selection panel is one of the most important settings in OpenRocket. It accepts:
+
+- A value chosen from the drop-down list of standard off-the-shelf delays available for that motor
+- Any custom numeric value you type in seconds
+
+**Recommended workflow for adjustable delays:**
+
+<Steps>
+  <Step title="Select a motor and an initial delay">
+    Choose any available delay from the drop-down to start.
+  </Step>
+  <Step title="Run the simulation">
+    Note the **Optimum delay** value in the results table.
+  </Step>
+  <Step title="Enter the optimum delay">
+    Return to **Select motor** and type the optimum delay (or the closest value your delay-drilling tool can achieve) into the **Ejection charge delay** field.
+  </Step>
+  <Step title="Run again to confirm">
+    Re-run the simulation. The warning about delay should be gone or significantly reduced.
+  </Step>
+</Steps>
+
+Even for non-adjustable delays, check **Optimum delay** and choose the motor whose stock delay is closest to the simulated value.
+
+## Getting a good simulation
+
+OpenRocket simulates an ideal rocket in an ideal virtual world. Real flights differ because of:
+
+- Local air density (a function of temperature and barometric pressure at launch time)
+- Manufacturer tolerances in motor components
+- Mismatch between the simulated and actual launch angle
+- Wind speed and direction variation with altitude
+- Fin flutter, surface finish, and real-world component performance
+- Inaccuracies in the simulated model itself
+
+Of these, model accuracy has the largest effect on prediction quality.
+
+### Building an accurate digital model
+
+<CardGroup cols={2}>
+  <Card title="Weigh every component" icon="scale-balanced">
+    Use a digital kitchen scale. Weigh short items (shock cord, wadding) in multiples and divide. Glue, filler, and paint all add mass.
+  </Card>
+  <Card title="Measure thicknesses and lengths" icon="ruler">
+    Inexpensive digital calipers are sufficient. Record wall thickness, fin chord, span, and all tube lengths.
+  </Card>
+  <Card title="Choose correct materials" icon="layers">
+    Select the closest matching material from the component's material menu. If needed, create a **Custom** material rather than using a mass override, which may not correctly represent the center of mass.
+  </Card>
+  <Card title="Build the model before the rocket" icon="pencil-ruler">
+    The best approach is to design your OpenRocket model before assembly. That way you can weigh and measure each part as you build.
+  </Card>
+</CardGroup>
+
+### Starting from a downloaded model
+
+If you start from a downloaded `.ork` or `.rkt` file (OpenRocket can open both), verify that:
+
+- All component types and dimensions match your actual rocket
+- The total weight and center of mass match your physical rocket
+- Any **mass overrides** in the downloaded file are adjusted or removed — overrides are often added to make an imperfect model agree with reality, but they may distort the weight distribution
+
+### Expectations on accuracy
+
+A carefully built OpenRocket model can predict ejection delay and altitude well. That said, OpenRocket tends to predict slightly more altitude than a rocket achieves in practice. Treat simulation results as useful estimates, not guarantees.
+
+<Tip>
+If you track your flights with an altimeter or flight computer, log the predicted and actual altitudes. Over a series of flights you'll develop a personal calibration factor for your rockets and motors.
+</Tip>

@@ -1,122 +1,106 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "OpenRocket",
+  "theme": "palm",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#ba4519",
+    "light": "#dcbec0",
+    "dark": "#ba4519"
   },
   "favicon": "/favicon.svg",
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/openrocket/openrocket"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/openrocket/openrocket"
+    }
+  },
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "User Guide",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Introduction",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "introduction/overview",
+              "introduction/features",
+              "introduction/faq",
+              "introduction/contribute"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Setup",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "setup/installation",
+              "setup/getting-started",
+              "setup/preferences"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Rocket Design",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "user-guide/basic-rocket-design",
+              "user-guide/advanced-rocket-design",
+              "user-guide/overrides-and-surface-finish"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Flight Simulation",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "user-guide/basic-flight-simulation",
+              "user-guide/advanced-flight-simulation",
+              "user-guide/rocket-analysis",
+              "user-guide/thrust-curves",
+              "user-guide/custom-expressions",
+              "user-guide/simulation-extensions"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Developer Guide",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Getting Started",
             "pages": [
-              "api-reference/introduction"
+              "dev-guide/development-overview",
+              "dev-guide/development-setup",
+              "dev-guide/development-guidelines"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Architecture",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "dev-guide/architecture",
+              "dev-guide/codebase-walkthrough",
+              "dev-guide/file-specification"
+            ]
+          },
+          {
+            "group": "Integration",
+            "pages": [
+              "dev-guide/using-openrocket-core",
+              "dev-guide/api-documentation",
+              "dev-guide/command-line-arguments"
+            ]
+          },
+          {
+            "group": "Contributing",
+            "pages": [
+              "dev-guide/testing-and-debugging",
+              "dev-guide/contributing-to-translations",
+              "dev-guide/contributing-to-docs",
+              "dev-guide/building-releasing",
+              "dev-guide/faq-troubleshooting"
             ]
           }
         ]
       }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
-  "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
-  },
-  "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
-    "primary": {
-      "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
-    }
-  },
-  "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
-  },
-  "footer": {
-    "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
-    }
+    ]
   }
 }

@@ -1,0 +1,211 @@
+---
+title: "Custom expressions"
+description: "Write custom mathematical expressions to compute new variables during simulation, then plot or export them alongside built-in flight data."
+---
+
+OpenRocket is not limited to its built-in simulation variables. Since version 12.09, you can define **custom expressions** — mathematical formulas that are evaluated at every simulation time step and treated exactly like native variables for plotting and CSV export.
+
+## Overview
+
+Custom expressions are stored in your `.ork` rocket document. To manage them, go to **Analyze → Custom expressions**. The Custom Expressions window lists all expressions defined for the current document.
+
+Initially the list is empty. Use the **New expression** button in the lower right to open the **Expression Builder**. You can also import expressions from another `.ork` file.
+
+## Building an expression
+
+The Expression Builder requires four fields before you can save an expression:
+
+| Field | Rules |
+|-------|-------|
+| **Name** | Any string not previously used as an expression name |
+| **Symbol** | A short locale-independent identifier: no numbers, whitespace, or special characters (brackets, operators, etc.) |
+| **Units** | Any string; leave blank for dimensionless quantities. If you enter a standard SI unit exactly, OpenRocket will offer unit conversion when plotting or exporting. |
+| **Expression** | A valid mathematical expression using variable symbols, operators, and numbers |
+
+Each field has an adjacent indicator that turns from red to green when the value is valid. You cannot save the expression until all indicators are green.
+
+### Supported SI units for automatic conversion
+
+If your expression's **Units** field contains one of these exactly, OpenRocket will automatically offer unit conversion:
+
+`m` `m^2` `m/s` `kg` `kg m^2` `kg m^3` `N` `Ns` `s` `Pa` `V` `A` `J` `W` `kg m/s` `Hz` `K`
+
+### Inserting variables and operators
+
+Click **Insert Variable** to open a searchable list of all available simulation variables and their symbols. Selecting a variable inserts its symbol at the current cursor position in the expression box.
+
+Click **Insert Operator** to open a similar list of all available mathematical operators and functions. This is especially useful for operators whose symbols cannot be typed on a standard keyboard.
+
+### Nesting custom expressions
+
+You can use the symbol of one custom expression inside another. This allows you to build up complex calculations incrementally.
+
+<Warning>
+Nested expressions are calculated in list order. If expression B depends on expression A, then A must appear above B in the Custom Expressions list. Use the blue up/down arrow buttons to reorder expressions.
+</Warning>
+
+## Available variables
+
+The full list of available variables is accessible from the **Insert Variable** dialog. The variables correspond to the built-in `FlightDataType` values used throughout OpenRocket's simulation engine. Key variables and their symbols include:
+
+<AccordionGroup>
+  <Accordion title="Time and position">
+    | Symbol | Variable |
+    |--------|----------|
+    | `t` | Time |
+    | `h` | Altitude |
+    | `ha` | Altitude above sea level |
+    | `Vz` | Vertical velocity |
+    | `Vt` | Total velocity |
+    | `Az` | Vertical acceleration |
+    | `At` | Total acceleration |
+    | `Px` | Position East of launch |
+    | `Py` | Position North of launch |
+    | `Pl` | Lateral distance |
+  </Accordion>
+  <Accordion title="Mass and inertia">
+    | Symbol | Variable |
+    |--------|----------|
+    | `m` | Total mass |
+    | `mp` | Motor mass |
+    | `Il` | Longitudinal moment of inertia |
+    | `Ir` | Rotational moment of inertia |
+    | `g` | Gravity |
+  </Accordion>
+  <Accordion title="Stability">
+    | Symbol | Variable |
+    |--------|----------|
+    | `Cp` | CP location |
+    | `Cg` | CG location |
+    | `S` | Stability margin (calibers) |
+  </Accordion>
+  <Accordion title="Thrust and drag">
+    | Symbol | Variable |
+    |--------|----------|
+    | `Ft` | Thrust force |
+    | `Twr` | Thrust-to-weight ratio |
+    | `Fd` | Drag force |
+    | `Cd` | Drag coefficient |
+    | `Cdf` | Friction drag coefficient |
+    | `Cdp` | Pressure drag coefficient |
+    | `Cdb` | Base drag coefficient |
+  </Accordion>
+  <Accordion title="Characteristic numbers">
+    | Symbol | Variable |
+    |--------|----------|
+    | `M` | Mach number |
+    | `R` | Reynolds number |
+  </Accordion>
+</AccordionGroup>
+
+## Index expressions
+
+Custom expressions are evaluated at each time step, but sometimes you need a value from an *earlier* point in the flight. **Index expressions** use square bracket syntax to specify a time in seconds:
+
+```text
+m / m[0]
+```
+
+This gives the ratio of the current mass to the launch mass (mass at time 0).
+
+```text
+m - m[t-1]
+```
+
+This gives the change in mass over the last one second.
+
+The value inside the brackets can be any valid sub-expression. Interpolation is used to return the exact value at the specified time, independent of the simulation's actual time steps. If you specify a time less than 0 or greater than the current time `t`, it is clamped to 0 or `t` respectively. You cannot reference data that has not yet been calculated.
+
+<Note>
+You cannot nest another index or range expression inside square brackets.
+</Note>
+
+## Range expressions
+
+Some operators work on a *range* of values rather than a single point. These range operators are identified in the **Insert Operator** dialog by the `[:]` placeholder already filled in for one or more parameters.
+
+Range expressions use a `start:end` syntax inside square brackets:
+
+```text
+mean(At[t-0.5:t])
+```
+
+This calculates the moving mean of total acceleration (`At`) over the last 0.5 seconds — a simple model of a low-pass filtered accelerometer output.
+
+The bounds can be any valid expression. If you omit the upper bound, it defaults to `t`; if you omit the lower bound, it defaults to 0:
+
+```text
+mean(At[t-0.5:])
+```
+
+### Practical example: filtered accelerometer voltage
+
+Many accelerometers clip above a maximum acceleration and return an analog voltage. This expression models a sensor that clips at 10 g and returns 0.2 V per g:
+
+```text
+0.2 * uclip( mean(At[t-.5:]), 10 )
+```
+
+- `uclip(x, max)` clips `x` to a maximum value of `max`
+- `mean(At[t-.5:])` computes the mean of total acceleration over the last 0.5 s
+- The outer `0.2 *` converts from acceleration (m/s²) to a voltage-like output
+
+Range data is generated by interpolation over the specified range with a fixed time step equal to the default simulation time step. This makes it straightforward to use integration functions like `trapz([:])` (trapezoidal integration) or `tnear([:], x)` (find the time when a variable is nearest a target value).
+
+## Example expressions
+
+<AccordionGroup>
+  <Accordion title="Launch mass fraction">
+    The ratio of current rocket mass to launch mass:
+
+    ```text
+    m / m[0]
+    ```
+
+    **Symbol:** `mf`  
+    **Units:** (dimensionless, leave blank)
+  </Accordion>
+  <Accordion title="Net force">
+    Thrust minus drag gives the net axial force:
+
+    ```text
+    Ft - Fd
+    ```
+
+    **Symbol:** `Fn`  
+    **Units:** `N`
+  </Accordion>
+  <Accordion title="Drag-to-thrust ratio">
+    How much drag relative to available thrust:
+
+    ```text
+    Fd / Ft
+    ```
+
+    **Symbol:** `DtT`  
+    **Units:** (dimensionless)
+  </Accordion>
+  <Accordion title="Stability margin in body diameters">
+    Convert the standard caliber stability margin to a fraction of body length (assuming reference length is the body diameter):
+
+    ```text
+    (Cg - Cp) / h
+    ```
+
+    **Note:** Replace `h` with the appropriate reference length symbol for your design.
+  </Accordion>
+</AccordionGroup>
+
+## Troubleshooting
+
+If an expression produces no data after running a simulation:
+
+1. Verify all indicator lights in the Expression Builder are green before saving
+2. Check the error log at **Help → Debug log**; look for entries under the `USER` category
+3. Verify that nested expressions are in the correct calculation order
+
+OpenRocket validates expressions as you type, but some errors only become apparent at runtime (for example, dividing by a variable that is zero during part of the flight). An invalid runtime expression produces no data for that time step but does not crash the simulation.
+
+<Note>
+Custom expressions are interpreted during the simulation and are slower than built-in variables. A few simple expressions have negligible overhead, but range expressions in particular can noticeably increase simulation time. If performance is a concern, consider implementing your calculation as a [simulation extension](/user-guide/simulation-extensions) instead.
+</Note>
